@@ -57,7 +57,7 @@ public class RescatesController {
             return ResponseEntity.ok(rescates);
         }
     }
-
+    
     @GetMapping("/todos-sin-fotos")
     @Operation(summary = "Mostrar todos los rescates del sistema sin fotos", description = "Devuelve una lista con todos los rescates del sistema sin incluir las fotos")
     public ResponseEntity<List<RescateDTO>> obtenerRescatesSinFotos() {

@@ -61,6 +61,34 @@ public class Animales {
     @Column(nullable = false)
     private boolean deleted = false;
 
+    @Column(nullable = false)
+    private boolean isDomestico = false;
+    
+    @Column(nullable = false)
+    private boolean disponibleAdopcion = false;
+    
+    @Enumerated(EnumType.STRING)
+    private EstadoAdopcion estadoAdopcion = EstadoAdopcion.NO_DISPONIBLE;
+    
+    public enum EstadoAdopcion {
+        DISPONIBLE, EN_PROCESO, ADOPTADO, NO_DISPONIBLE
+    }
+
+    public Animales(Long id, String especie, String nombre_comun, String descripcion, String foto, 
+                   EstadoConservacion estado_conservacion, Familia familia, boolean deleted) {
+        this.id = id;
+        this.especie = especie;
+        this.nombre_comun = nombre_comun;
+        this.descripcion = descripcion;
+        this.foto = foto;
+        this.estado_conservacion = estado_conservacion;
+        this.familia = familia;
+        this.deleted = deleted;
+        this.isDomestico = false;
+        this.disponibleAdopcion = false;
+        this.estadoAdopcion = EstadoAdopcion.NO_DISPONIBLE;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
