@@ -16,7 +16,7 @@ export class SignFormPage implements OnInit, AfterViewInit {
   constructor(private http: HttpClient, private router: Router) { }
 
   ngOnInit() {
-    
+
   }
 
   ngAfterViewInit() {
@@ -107,14 +107,14 @@ export class SignFormPage implements OnInit, AfterViewInit {
       password: this.password
     };
 
-    this.http.post<any>('http://52.232.4.28:9000/auth/login', loginRequest).subscribe(
+    this.http.post<any>('http://localhost:9000/auth/login', loginRequest).subscribe(
       response => {
         /*sessionStorage.setItem('token', response.token);
         sessionStorage.setItem('rol', response.roles);*/
 
         // Guardamos el token en las cookies HttpOnly
         document.cookie = `token=${response.token}; path=/; HttpOnly`;
-        
+
         // Decodificamos el token para obtener el rol y el id
         const tokenPayload = JSON.parse(atob(response.token.split('.')[1]));
         const userId = tokenPayload.sub;
@@ -122,14 +122,14 @@ export class SignFormPage implements OnInit, AfterViewInit {
 
         // Guardamos el rol y el id en cookies HttpOnly
         /*document.cookie = `rol=${userRol}; path=/; HttpOnly`;
-        document.cookie = `id=${userId}; path=/; HttpOnly`;*/        
+        document.cookie = `id=${userId}; path=/; HttpOnly`;*/
         sessionStorage.setItem('token', response.token);
         sessionStorage.setItem('rol', userRol);
         sessionStorage.setItem('id', userId);
 
         // Redirigimos a la página principal
         this.router.navigateByUrl('/Perfil').then(() => {window.location.reload();});
-        
+
       },
       error => {
         console.error('Error durante el incio de sesión', error);
