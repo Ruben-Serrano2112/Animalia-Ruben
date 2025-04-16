@@ -48,11 +48,11 @@ const routes: Routes = [
   },
   {
     path: 'donaciones',
-    loadChildren: () => import('./donaciones/donaciones.page').then(m => m.DonacionesPage)
+    loadChildren: () => import('./donaciones/donaciones.module').then(m => m.DonacionesPageModule)
   },
   {
     path: 'adopciones',
-    loadChildren: () => import('./adopciones/adopciones.page').then(m => m.AdopcionesPage)
+    loadChildren: () => import('./adopciones/adopciones.module').then(m => m.AdopcionesPageModule)
   }
 ];
 @NgModule({

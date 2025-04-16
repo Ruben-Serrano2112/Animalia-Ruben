@@ -22,4 +22,6 @@ public interface AnimalesRepositorio extends JpaRepository<Animales, Long> {
 
     @Query("SELECT a FROM Animales a WHERE a.id = :id AND a.deleted = false")
     Optional<Animales> findByIdActive(Long id);
+
+    List<Animales> findByEstadoAdopcionAndDeletedFalse(Animales.EstadoAdopcion estadoAdopcion);
 }

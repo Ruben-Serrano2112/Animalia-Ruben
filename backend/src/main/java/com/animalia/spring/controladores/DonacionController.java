@@ -17,14 +17,16 @@ public class DonacionController {
     @Autowired
     private DonacionServicio donacionServicio;
 
-    @PostMapping
+    @PostMapping("/crear")
     @Operation(summary = "Crear una nueva donación", description = "Crea una nueva donación para una empresa")
-    public ResponseEntity<Donacion> crearDonacion(
-            @RequestParam Long usuarioId,
-            @RequestParam Long empresaId,
-            @RequestParam Double monto,
-            @RequestParam(required = false) String comentario) {
-        return ResponseEntity.ok(donacionServicio.crearDonacion(usuarioId, empresaId, monto, comentario));
+    public ResponseEntity<Donacion> crearDonacion(@RequestBody Donacion donacion) {
+        return ResponseEntity.ok(donacionServicio.crearDonacion(donacion.getUsuarioId(), donacion.getEmpresaId(), donacion.getMonto(), donacion.getComentario(), donacion.getMetodoPago()));
+    }
+
+    @GetMapping("/recientes")
+    @Operation(summary = "Obtener donaciones recientes", description = "Lista las donaciones más recientes")
+    public ResponseEntity<List<Donacion>> obtenerDonacionesRecientes() {
+        return ResponseEntity.ok(donacionServicio.obtenerDonacionesRecientes());
     }
 
     @GetMapping("/empresa/{empresaId}")

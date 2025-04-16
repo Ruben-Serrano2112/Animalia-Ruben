@@ -1,28 +1,117 @@
-ion-card {
-  margin: 16px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+ion-content {
+  --background: var(--ion-color-light);
+
+  ion-card {
+    margin: 16px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+    ion-card-header {
+      background: var(--ion-color-primary);
+      color: white;
+      border-radius: 12px 12px 0 0;
+
+      ion-card-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+      }
+    }
+  }
 }
 
-ion-card-header {
-  background-color: var(--ion-color-primary);
-  color: white;
-  border-radius: 8px 8px 0 0;
+.proceso-card {
+  ion-card-content {
+    padding: 16px;
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+  }
 }
 
-ion-card-title {
-  font-size: 1.2em;
-  font-weight: bold;
+.tipo-segment {
+  margin: 16px 0;
+
+  ion-segment-button {
+    --color: var(--ion-color-medium);
+    --color-checked: var(--ion-color-primary);
+    --indicator-color: var(--ion-color-primary);
+
+    &.selected {
+      --background: var(--ion-color-primary-tint);
+      --color: var(--ion-color-primary);
+    }
+  }
 }
 
-ion-button {
-  margin-top: 16px;
+.amount-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0;
+
+  ion-button {
+    flex: 1;
+    min-width: 80px;
+    --border-radius: 20px;
+
+    &[fill="solid"] {
+      --background: var(--ion-color-primary);
+      --color: white;
+    }
+
+    &[fill="outline"] {
+      --border-color: var(--ion-color-primary);
+      --color: var(--ion-color-primary);
+    }
+  }
 }
 
-ion-list {
-  background: transparent;
+ion-radio-group {
+  ion-item {
+    --padding-start: 0;
+
+    ion-icon {
+      margin-right: 8px;
+      color: var(--ion-color-primary);
+    }
+  }
 }
 
-ion-item {
-  --background: transparent;
+.donaciones-recientes-card {
+  ion-item {
+    --padding-start: 0;
+    --inner-padding-end: 0;
+
+    h2 {
+      font-weight: 600;
+      color: var(--ion-color-dark);
+    }
+
+    p {
+      color: var(--ion-color-medium);
+      margin: 4px 0;
+
+      &.fecha {
+        font-size: 0.8rem;
+        color: var(--ion-color-medium-shade);
+      }
+    }
+  }
 }
+
+ion-select {
+  width: 100%;
+  max-width: 100%;
+  --padding-start: 0;
+}
+
+ion-button[type="submit"] {
+  margin-top: 24px;
+  --border-radius: 8px;
+  height: 48px;
+  font-weight: 600;
+}
+

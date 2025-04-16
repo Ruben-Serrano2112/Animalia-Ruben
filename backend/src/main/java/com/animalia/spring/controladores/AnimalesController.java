@@ -1,6 +1,7 @@
 package com.animalia.spring.controladores;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -87,5 +88,22 @@ public class AnimalesController {
     @Operation(summary = "Actualizar un animal", description = "Actualizar los datos de un animal en el sistema")
     public ResponseEntity<Animales> actualizarAnimal(@RequestBody Animales animal) {
         return ResponseEntity.ok(animalesServicio.actualizarAnimal(animal));
+    }
+
+    @GetMapping("/disponibles-adopcion")
+    @Operation(summary = "Obtener animales disponibles para adopción", description = "Devuelve una lista de animales disponibles para adopción")
+    public ResponseEntity<List<Animales>> obtenerAnimalesDisponiblesAdopcion() {
+        List<Animales> animales = animalesServicio.obtenerAnimalesDisponiblesAdopcion();
+        return ResponseEntity.ok(animales);
+    }
+
+    @PostMapping("/{id}/solicitar-adopcion")
+    @Operation(summary = "Solicitar adopción de un animal", description = "Procesa una solicitud de adopción para un animal específico")
+    public ResponseEntity<Animales> solicitarAdopcion(
+            @PathVariable Long id,
+            @RequestBody Map<String, Long> request) {
+        Long usuarioId = request.get("usuarioId");
+        Animales animal = animalesServicio.solicitarAdopcion(id, usuarioId);
+        return ResponseEntity.ok(animal);
     }
 }

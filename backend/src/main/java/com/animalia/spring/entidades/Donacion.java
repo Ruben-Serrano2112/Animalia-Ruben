@@ -16,22 +16,36 @@ public class Donacion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @ManyToOne
-    @JoinColumn(name = "usuario_id", nullable = false)
-    private Usuarios usuario;
-    
-    @ManyToOne
-    @JoinColumn(name = "empresa_id", nullable = false)
-    private Empresas empresa;
-    
-    @Column(nullable = false)
-    private Double monto;
-    
-    @Column(nullable = false)
-    private LocalDateTime fecha;
-    
     private String comentario;
     
     @Column(nullable = false)
     private boolean deleted = false;
+    
+    @Column(nullable = false)
+    private LocalDateTime fecha;
+    
+    @Column(nullable = false)
+    private Double monto;
+    
+    @Column(name = "empresa_id")
+    private Long empresaId;
+    
+    @Column(name = "usuario_id")
+    private Long usuarioId;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private MetodoPago metodoPago;
+    
+    public enum MetodoPago {
+        TARJETA_CREDITO,
+        TARJETA_DEBITO,
+        TRANSFERENCIA,
+        PAYPAL
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        fecha = LocalDateTime.now();
+    }
 } 

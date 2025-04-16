@@ -47,4 +47,17 @@ public class AnimalesServicio {
     public Animales actualizarAnimal(Animales animal) {
         return animalesRepositorio.save(animal);
     }
+
+    public List<Animales> obtenerAnimalesDisponiblesAdopcion() {
+        return animalesRepositorio.findByEstadoAdopcionAndDeletedFalse(Animales.EstadoAdopcion.DISPONIBLE);
+    }
+
+    public Animales solicitarAdopcion(Long animalId, Long usuarioId) {
+        Animales animal = obtenerAnimalPorId(animalId);
+        if (animal != null && animal.getEstadoAdopcion() == Animales.EstadoAdopcion.DISPONIBLE) {
+            animal.setEstadoAdopcion(Animales.EstadoAdopcion.EN_PROCESO);
+            return animalesRepositorio.save(animal);
+        }
+        throw new RuntimeException("Animal no disponible para adopción");
+    }
 }

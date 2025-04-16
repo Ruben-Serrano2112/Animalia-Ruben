@@ -44,6 +44,14 @@ const routes: Routes = [
         loadChildren: () => import('../inicio/inicio.module').then(m => m.InicioPageModule)
       },
       {
+        path: 'Adopciones',
+        loadChildren: () => import('../adopciones/adopciones.module').then(m => m.AdopcionesPageModule)
+      },
+      {
+        path: 'Donaciones',
+        loadChildren: () => import('../donaciones/donaciones.module').then(m => m.DonacionesPageModule)
+      },
+      {
         path: '',
         redirectTo: '/Inicio',
         pathMatch: 'full'

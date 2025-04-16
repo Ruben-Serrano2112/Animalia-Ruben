@@ -46,19 +46,32 @@ export class TabsPage implements OnInit {
       this.tabs = [
         { title: 'Animales', route: '/Animales' },
         { title: 'Camara', route: '/Camara' },
+        { title: 'Adopciones', route: '/adopciones' },
+        { title: 'Donaciones', route: '/donaciones' },
+        { title: 'Rescates', route: '/Rescates' },
+        { title: 'Gestion', route: '/Gestion' },
+        { title: 'Perfil', route: '/perfil' }
       ];
     } else if (rol === 'USER') {
       this.tabs = [
         { title: 'Animales', route: '/Animales' },
+        { title: 'Adopciones', route: '/adopciones' },
+        { title: 'Donaciones', route: '/donaciones' },
+        { title: 'Camara', route: '/Camara' },
+        { title: 'Perfil', route: '/perfil' }
       ];
     } else if (rol === 'EMPRESA') {
       this.tabs = [
+        { title: 'Animales', route: '/Animales' },
         { title: 'Camara', route: '/Camara' },
+        { title: 'Rescates', route: '/Rescates' },
+        { title: 'Perfil', route: '/perfil' }
       ];
     } else {
       this.tabs = [
         { title: 'Animales', route: '/Animales' },
-        { title: 'Inicio', route: '/Inicio' },
+        { title: 'Empresas', route: '/Empresas' },
+        { title: 'IniciarSesion', route: '/Sign-form' }
       ];
     }
   }

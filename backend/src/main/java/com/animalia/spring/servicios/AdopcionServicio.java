@@ -28,7 +28,7 @@ public class AdopcionServicio {
         Animales animal = animalesRepositorio.findById(animalId)
                 .orElseThrow(() -> new RuntimeException("Animal no encontrado"));
 
-        if (!animal.isDomestico() || !animal.isDisponibleAdopcion()) {
+        if (!animal.isDomestico() || animal.getEstadoAdopcion() != Animales.EstadoAdopcion.DISPONIBLE) {
             throw new RuntimeException("Este animal no está disponible para adopción");
         }
 

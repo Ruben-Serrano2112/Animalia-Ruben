@@ -1,0 +1,36 @@
+ion-content {
+  --padding-top: 16px;
+  --padding-bottom: 16px;
+}
+
+ion-img {
+  border-radius: 8px;
+  margin-bottom: 16px;
+  max-height: 300px;
+  object-fit: cover;
+}
+
+h2 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+p {
+  color: var(--ion-color-medium);
+  margin-bottom: 16px;
+}
+
+ion-textarea {
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+  min-height: 100px;
+}
+
+.ion-padding {
+  margin-top: 16px;
+}
+
+ion-button {
+  margin-bottom: 8px;
+}

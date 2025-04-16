@@ -25,4 +25,12 @@ export class AnimalesService {
   obtenerImagenUrl(nombreImagen: string): string {
     return `${this.apiUrl}/imagen/${nombreImagen}`;
   }
+
+  getAnimalesDisponiblesAdopcion(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/animales/disponibles-adopcion`);
+  }
+
+  solicitarAdopcion(animalId: number, usuarioId: number): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/animales/${animalId}/solicitar-adopcion`, { usuarioId });
+  }
 }

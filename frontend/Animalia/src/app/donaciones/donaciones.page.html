@@ -1,43 +1,87 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar color="primary">
     <ion-title>Donaciones</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <ion-card>
+  <ion-card class="proceso-card">
     <ion-card-header>
-      <ion-card-title>Realizar Donación</ion-card-title>
+      <ion-card-title>Realizar una donación</ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      <ion-item>
-        <ion-label position="stacked">Cantidad</ion-label>
-        <ion-input type="number"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label position="stacked">Método de pago</ion-label>
-        <ion-select>
-          <ion-select-option value="tarjeta">Tarjeta de crédito</ion-select-option>
-          <ion-select-option value="paypal">PayPal</ion-select-option>
-          <ion-select-option value="transferencia">Transferencia bancaria</ion-select-option>
-        </ion-select>
-      </ion-item>
-      <ion-button expand="block" class="ion-margin-top">
-        Donar
-      </ion-button>
+      <form [formGroup]="donationForm" (ngSubmit)="submitDonation()">
+        <!-- Selección de empresa -->
+        <ion-item>
+          <ion-label position="stacked">Selecciona una empresa</ion-label>
+          <ion-select formControlName="empresaId" interface="action-sheet">
+            <ion-select-option *ngFor="let empresa of filteredEmpresas" [value]="empresa.id">
+              {{ empresa.nombre }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <!-- Cantidad de donación -->
+        <div class="amount-buttons">
+          <ion-button
+            *ngFor="let amount of predefinedAmounts"
+            [fill]="selectedAmount === amount.toString() ? 'solid' : 'outline'"
+            (click)="selectAmount(amount)">
+            {{ amount }}€
+          </ion-button>
+        </div>
+
+        <ion-item>
+          <ion-label position="stacked">Cantidad personalizada (€)</ion-label>
+          <ion-input
+            type="number"
+            formControlName="monto"
+            [value]="selectedAmount === 'custom' ? '' : selectedAmount">
+          </ion-input>
+        </ion-item>
+
+        <!-- Método de pago -->
+        <ion-list>
+          <ion-radio-group formControlName="metodoPago">
+            <ion-list-header>
+              <ion-label>Método de pago</ion-label>
+            </ion-list-header>
+
+            <ion-item *ngFor="let method of paymentMethods">
+              <ion-label>
+                <ion-icon [name]="method.icon"></ion-icon>
+                {{ method.name }}
+              </ion-label>
+              <ion-radio [value]="method.id"></ion-radio>
+            </ion-item>
+          </ion-radio-group>
+        </ion-list>
+
+        <!-- Comentario -->
+        <ion-item>
+          <ion-label position="stacked">Comentario (opcional)</ion-label>
+          <ion-textarea formControlName="comentario" rows="3"></ion-textarea>
+        </ion-item>
+
+        <ion-button expand="block" type="submit" [disabled]="!donationForm.valid">
+          Donar
+        </ion-button>
+      </form>
     </ion-card-content>
   </ion-card>
 
-  <ion-card>
+  <!-- Donaciones recientes -->
+  <ion-card class="donaciones-recientes-card" *ngIf="donacionesRecientes.length > 0">
     <ion-card-header>
-      <ion-card-title>Donaciones Recientes</ion-card-title>
+      <ion-card-title>Donaciones recientes</ion-card-title>
     </ion-card-header>
     <ion-card-content>
       <ion-list>
-        <ion-item>
+        <ion-item *ngFor="let donacion of donacionesRecientes">
           <ion-label>
-            <h2>Donación a Refugio XYZ</h2>
-            <p>50€ - 25/03/2024</p>
+            <h2>Donación de {{ donacion.monto }}€</h2>
+            <p>{{ donacion.comentario }}</p>
+            <p class="fecha">{{ donacion.fecha | date:'short' }}</p>
           </ion-label>
         </ion-item>
       </ion-list>

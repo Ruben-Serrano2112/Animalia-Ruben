@@ -64,9 +64,6 @@ public class Animales {
     @Column(nullable = false)
     private boolean isDomestico = false;
     
-    @Column(nullable = false)
-    private boolean disponibleAdopcion = false;
-    
     @Enumerated(EnumType.STRING)
     private EstadoAdopcion estadoAdopcion = EstadoAdopcion.NO_DISPONIBLE;
     
@@ -85,7 +82,6 @@ public class Animales {
         this.familia = familia;
         this.deleted = deleted;
         this.isDomestico = false;
-        this.disponibleAdopcion = false;
         this.estadoAdopcion = EstadoAdopcion.NO_DISPONIBLE;
     }
 
