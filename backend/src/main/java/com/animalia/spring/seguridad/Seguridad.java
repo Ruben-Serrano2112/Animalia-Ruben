@@ -72,8 +72,8 @@ public class Seguridad {
                 registry.addMapping("/**")
                         .allowedOriginPatterns("*", "/frontend", "172.21.0.3")//cambiar a contenedor de la api de frotend
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedHeaders("*")
-                        .allowCredentials(true);
+                        .allowedHeaders("*");
+                        // .allowCredentials(true);
             }
         };
     }

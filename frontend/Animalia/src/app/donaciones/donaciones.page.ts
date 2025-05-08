@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ToastController } from '@ionic/angular';
+import { ToastController, ModalController } from '@ionic/angular';
 import { DonacionesService } from '../services/donaciones.service';
 import { EmpresasService } from '../services/empresas.service';
+import { UsuarioService } from '../services/usuario.service';
 
 @Component({
   selector: 'app-donaciones',
@@ -33,11 +34,29 @@ export class DonacionesPage implements OnInit {
   itemsPerPage: number = 5;
   paginaActual: any[] = [];
 
+  donacionesEmpresa: any[] = [];
+  isEmpresa: boolean = false;
+  empresaId: number | null = null;
+  showDonations: boolean = true;
+
+  donacionesUsuario: any[] = [];
+  showUserDonations: boolean = false;
+
+  donacionesAdmin: any[] = [];
+  showAdminDonations: boolean = false;
+
+  userRol: string | null = null;
+  isAdmin: boolean = false;
+
+  showFormModal: boolean = false;
+
   constructor(
     private formBuilder: FormBuilder,
     private toastController: ToastController,
     private donacionesService: DonacionesService,
-    private empresasService: EmpresasService
+    private empresasService: EmpresasService,
+    private usuarioService: UsuarioService,
+    private modalController: ModalController
   ) {
     this.donationForm = this.formBuilder.group({
       monto: ['', [Validators.required, Validators.min(1)]],
@@ -49,6 +68,24 @@ export class DonacionesPage implements OnInit {
   }
 
   ngOnInit() {
+    this.userRol = sessionStorage.getItem('rol');
+    this.isEmpresa = this.userRol === 'EMPRESA';
+    this.isAdmin = this.userRol === 'ADMIN';
+    if (this.isAdmin) {
+      this.cargarTodasLasDonaciones();
+    }
+    if (this.isEmpresa) {
+      const usuarioId = sessionStorage.getItem('id');
+      if (usuarioId) {
+        this.usuarioService.getEmpresaIdByUsuarioId(usuarioId).subscribe(empresaId => {
+          this.empresaId = Number(empresaId);
+          console.log('EmpresaId detectado (endpoint):', this.empresaId);
+          if (this.empresaId) {
+            this.cargarDonacionesEmpresa(this.empresaId);
+          }
+        });
+      }
+    }
     this.cargarDonacionesRecientes();
     this.cargarEmpresas();
   }
@@ -56,7 +93,11 @@ export class DonacionesPage implements OnInit {
   cargarEmpresas() {
     this.empresasService.getTotalEmpresas().subscribe(
       (empresas) => {
-        this.empresas = empresas;
+        if (this.isEmpresa && this.empresaId) {
+          this.empresas = empresas.filter((e: any) => e.id !== this.empresaId);
+        } else {
+          this.empresas = empresas;
+        }
         this.filteredEmpresas = [...this.empresas];
         this.totalEmpresas = this.filteredEmpresas.length;
         this.totalPages = Math.ceil(this.totalEmpresas / this.itemsPerPage);
@@ -182,5 +223,77 @@ export class DonacionesPage implements OnInit {
       });
       toast.present();
     }
+  }
+
+  async cargarDonacionesEmpresa(empresaId: number) {
+    this.donacionesService.obtenerDonacionesPorEmpresa(empresaId).subscribe(async (donaciones) => {
+      console.log('Donaciones recibidas:', donaciones);
+      // Para cada donación, obtener el nombre del usuario donante
+      this.donacionesEmpresa = await Promise.all(donaciones.map(async (donacion: any) => {
+        let usuarioNombre = '';
+        if (donacion.usuarioId) {
+          try {
+            const usuario = await this.usuarioService.getUsuarioById(donacion.usuarioId).toPromise();
+            usuarioNombre = usuario?.nombre + ' ' + (usuario?.apellido || '');
+          } catch {
+            usuarioNombre = 'Usuario';
+          }
+        }
+        return { ...donacion, usuarioNombre };
+      }));
+      console.log('Donaciones para mostrar:', this.donacionesEmpresa);
+    });
+  }
+
+  async abrirFormularioDonacion() {
+    this.showFormModal = true;
+  }
+
+  cerrarFormularioDonacion() {
+    this.showFormModal = false;
+    if (this.isAdmin) this.showAdminDonations = true;
+    if (this.isEmpresa) this.showDonations = true;
+  }
+
+  verMisDonaciones() {
+    const usuarioId = sessionStorage.getItem('id');
+    if (usuarioId) {
+      this.donacionesService.obtenerDonacionesPorUsuario(Number(usuarioId)).subscribe(donaciones => {
+        this.donacionesUsuario = donaciones;
+        this.showUserDonations = true;
+      });
+    }
+  }
+
+  volverAlFormulario() {
+    this.showUserDonations = false;
+  }
+
+  cargarTodasLasDonaciones() {
+    this.donacionesService.obtenerTodasLasDonaciones().subscribe(async (donaciones) => {
+      // Obtener nombres de usuario y empresa para cada donación
+      this.donacionesAdmin = await Promise.all(donaciones.map(async (donacion: any) => {
+        let usuarioNombre = '';
+        let empresaNombre = '';
+        if (donacion.usuarioId) {
+          try {
+            const usuario = await this.usuarioService.getUsuarioById(donacion.usuarioId).toPromise();
+            usuarioNombre = usuario?.nombre + ' ' + (usuario?.apellido || '');
+          } catch {
+            usuarioNombre = 'Usuario';
+          }
+        }
+        if (donacion.empresaId) {
+          try {
+            const empresa = await this.empresasService.getById(donacion.empresaId).toPromise();
+            empresaNombre = empresa?.nombre || 'Empresa';
+          } catch {
+            empresaNombre = 'Empresa';
+          }
+        }
+        return { ...donacion, usuarioNombre, empresaNombre };
+      }));
+      this.showAdminDonations = true;
+    });
   }
 }

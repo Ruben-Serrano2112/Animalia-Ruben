@@ -5,86 +5,159 @@
 </ion-header>
 
 <ion-content>
-  <ion-card class="proceso-card">
-    <ion-card-header>
-      <ion-card-title>Realizar una donación</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <form [formGroup]="donationForm" (ngSubmit)="submitDonation()">
-        <!-- Selección de empresa -->
-        <ion-item>
-          <ion-label position="stacked">Selecciona una empresa</ion-label>
-          <ion-select formControlName="empresaId" interface="action-sheet">
-            <ion-select-option *ngFor="let empresa of filteredEmpresas" [value]="empresa.id">
-              {{ empresa.nombre }}
-            </ion-select-option>
-          </ion-select>
-        </ion-item>
-
-        <!-- Cantidad de donación -->
-        <div class="amount-buttons">
-          <ion-button
-            *ngFor="let amount of predefinedAmounts"
-            [fill]="selectedAmount === amount.toString() ? 'solid' : 'outline'"
-            (click)="selectAmount(amount)">
-            {{ amount }}€
-          </ion-button>
-        </div>
-
-        <ion-item>
-          <ion-label position="stacked">Cantidad personalizada (€)</ion-label>
-          <ion-input
-            type="number"
-            formControlName="monto"
-            [value]="selectedAmount === 'custom' ? '' : selectedAmount">
-          </ion-input>
-        </ion-item>
-
-        <!-- Método de pago -->
+  <!-- Vista de donaciones recibidas para empresas -->
+  <ng-container *ngIf="isEmpresa && showDonations">
+    <ion-card class="donaciones-recientes-card" *ngIf="donacionesEmpresa.length > 0">
+      <ion-card-header>
+        <ion-card-title>Donaciones recibidas</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
         <ion-list>
-          <ion-radio-group formControlName="metodoPago">
-            <ion-list-header>
-              <ion-label>Método de pago</ion-label>
-            </ion-list-header>
-
-            <ion-item *ngFor="let method of paymentMethods">
-              <ion-label>
-                <ion-icon [name]="method.icon"></ion-icon>
-                {{ method.name }}
-              </ion-label>
-              <ion-radio [value]="method.id"></ion-radio>
-            </ion-item>
-          </ion-radio-group>
+          <ion-item *ngFor="let donacion of donacionesEmpresa">
+            <ion-label>
+              <h2>{{ donacion.usuarioNombre }} donó {{ donacion.monto }}€</h2>
+              <p>{{ donacion.comentario }}</p>
+              <p class="fecha">{{ donacion.fecha | date:'short' }}</p>
+            </ion-label>
+          </ion-item>
         </ion-list>
+      </ion-card-content>
+    </ion-card>
+    <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+      <ion-fab-button color="primary" (click)="abrirFormularioDonacion()">
+        <ion-icon name="add"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
+  </ng-container>
 
-        <!-- Comentario -->
-        <ion-item>
-          <ion-label position="stacked">Comentario (opcional)</ion-label>
-          <ion-textarea formControlName="comentario" rows="3"></ion-textarea>
-        </ion-item>
+  <!-- Formulario de donación (oculto para empresa y admin por defecto, pero visible si showFormModal) -->
+  <ng-container *ngIf="showFormModal || (!isEmpresa && !isAdmin && !showUserDonations)">
+    <ion-card class="proceso-card">
+      <ion-card-header>
+        <ion-card-title>Realizar una donación</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <form [formGroup]="donationForm" (ngSubmit)="submitDonation()">
+          <!-- Selección de empresa -->
+          <ion-item>
+            <ion-label position="stacked">Selecciona una empresa</ion-label>
+            <ion-select formControlName="empresaId" interface="action-sheet">
+              <ion-select-option *ngFor="let empresa of filteredEmpresas" [value]="empresa.id">
+                {{ empresa.nombre }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
 
-        <ion-button expand="block" type="submit" [disabled]="!donationForm.valid">
-          Donar
+          <!-- Cantidad de donación -->
+          <div class="amount-buttons">
+            <ion-button
+              *ngFor="let amount of predefinedAmounts"
+              [fill]="selectedAmount === amount.toString() ? 'solid' : 'outline'"
+              (click)="selectAmount(amount)">
+              {{ amount }}€
+            </ion-button>
+          </div>
+
+          <ion-item>
+            <ion-label position="stacked">Cantidad personalizada (€)</ion-label>
+            <ion-input
+              type="number"
+              formControlName="monto"
+              [value]="selectedAmount === 'custom' ? '' : selectedAmount">
+            </ion-input>
+          </ion-item>
+
+          <ion-list>
+            <ion-radio-group formControlName="metodoPago">
+              <ion-list-header>
+                <ion-label>Método de pago</ion-label>
+              </ion-list-header>
+
+              <ion-item *ngFor="let method of paymentMethods">
+                <ion-label>
+                  <ion-icon [name]="method.icon"></ion-icon>
+                  {{ method.name }}
+                </ion-label>
+                <ion-radio [value]="method.id"></ion-radio>
+              </ion-item>
+            </ion-radio-group>
+          </ion-list>
+
+          <!-- Comentario -->
+          <ion-item>
+            <ion-label position="stacked">Comentario (opcional)</ion-label>
+            <ion-textarea formControlName="comentario" rows="3"></ion-textarea>
+          </ion-item>
+
+          <ion-button expand="block" type="submit" [disabled]="!donationForm.valid">
+            Donar
+          </ion-button>
+          <ion-button expand="block" color="medium" *ngIf="isEmpresa || isAdmin" (click)="cerrarFormularioDonacion()">
+            Cancelar
+          </ion-button>
+        </form>
+        <ion-button expand="block" color="medium" *ngIf="!isEmpresa && !isAdmin" (click)="verMisDonaciones()">
+          Ver mis donaciones
         </ion-button>
-      </form>
-    </ion-card-content>
-  </ion-card>
+      </ion-card-content>
+    </ion-card>
+  </ng-container>
 
-  <!-- Donaciones recientes -->
-  <ion-card class="donaciones-recientes-card" *ngIf="donacionesRecientes.length > 0">
-    <ion-card-header>
-      <ion-card-title>Donaciones recientes</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-list>
-        <ion-item *ngFor="let donacion of donacionesRecientes">
-          <ion-label>
-            <h2>Donación de {{ donacion.monto }}€</h2>
-            <p>{{ donacion.comentario }}</p>
-            <p class="fecha">{{ donacion.fecha | date:'short' }}</p>
-          </ion-label>
-        </ion-item>
-      </ion-list>
-    </ion-card-content>
-  </ion-card>
+  <!-- Lista de donaciones del usuario -->
+  <ng-container *ngIf="showUserDonations && !isEmpresa">
+    <ion-card class="donaciones-recientes-card">
+      <ion-card-header>
+        <ion-card-title>Mis donaciones</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list *ngIf="donacionesUsuario.length > 0">
+          <ion-item *ngFor="let donacion of donacionesUsuario">
+            <ion-label>
+              <h2>Donación de {{ donacion.monto }}€ a empresa #{{ donacion.empresaId }}</h2>
+              <p>{{ donacion.comentario }}</p>
+              <p class="fecha">{{ donacion.fecha | date:'short' }}</p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+        <div *ngIf="donacionesUsuario.length === 0">
+          <p>No has realizado donaciones aún.</p>
+        </div>
+        <ion-button expand="block" color="medium" (click)="volverAlFormulario()">
+          Volver al formulario
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+  </ng-container>
+
+  <!-- Vista de donaciones para ADMIN -->
+  <ng-container *ngIf="isAdmin && showAdminDonations">
+    <ion-card class="donaciones-recientes-card">
+      <ion-card-header>
+        <ion-card-title>Todas las donaciones</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list *ngIf="donacionesAdmin.length > 0">
+          <ion-item *ngFor="let donacion of donacionesAdmin">
+            <ion-label>
+              <h2>{{ donacion.usuarioNombre }} donó {{ donacion.monto }}€ a {{ donacion.empresaNombre }}</h2>
+              <p><strong>Comentario:</strong> {{ donacion.comentario }}</p>
+              <p><strong>Fecha:</strong> {{ donacion.fecha | date:'short' }}</p>
+              <p><strong>Método de pago:</strong> {{ donacion.metodoPago }}</p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+        <div *ngIf="donacionesAdmin.length === 0">
+          <p>No hay donaciones registradas.</p>
+        </div>
+      </ion-card-content>
+    </ion-card>
+    <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+      <ion-fab-button color="primary" (click)="abrirFormularioDonacion()">
+        <ion-icon name="add"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
+  </ng-container>
+
+  <!-- Donaciones recientes para usuarios normales -->
+  <!-- (Eliminado el bloque de donaciones recientes para usuarios normales) -->
 </ion-content>

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.animalia.spring.Excepciones.AnimalNoEcontrada;
@@ -105,5 +106,20 @@ public class AnimalesController {
         Long usuarioId = request.get("usuarioId");
         Animales animal = animalesServicio.solicitarAdopcion(id, usuarioId);
         return ResponseEntity.ok(animal);
+    }
+
+    @GetMapping("/empresa/{empresaId}")
+    public ResponseEntity<List<Animales>> obtenerAnimalesPorEmpresa(@PathVariable Long empresaId) {
+        List<Animales> animales = animalesServicio.obtenerAnimalesPorEmpresa(empresaId);
+        return ResponseEntity.ok(animales);
+    }
+
+    @PutMapping("/{animalId}/domestico")
+    public ResponseEntity<Animales> actualizarDomesticoYEstado(@PathVariable Long animalId, @RequestBody Map<String, Object> body) {
+        boolean isDomestico = Boolean.parseBoolean(body.getOrDefault("isDomestico", false).toString());
+        String estadoAdopcionStr = body.getOrDefault("estadoAdopcion", "NO_DISPONIBLE").toString();
+        Animales.EstadoAdopcion estadoAdopcion = Animales.EstadoAdopcion.valueOf(estadoAdopcionStr);
+        Animales actualizado = animalesServicio.actualizarDomesticoYEstado(animalId, isDomestico, estadoAdopcion);
+        return ResponseEntity.ok(actualizado);
     }
 }

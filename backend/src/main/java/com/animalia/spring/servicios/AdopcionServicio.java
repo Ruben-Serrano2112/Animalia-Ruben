@@ -32,14 +32,14 @@ public class AdopcionServicio {
             throw new RuntimeException("Este animal no está disponible para adopción");
         }
 
-        Adopcion adopcion = new Adopcion();
-        Usuarios u = usuariosRepositorio.findById(usuarioId)
+        Usuarios usuario = usuariosRepositorio.findById(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        Animales a = animalesRepositorio.findById(animalId)
-                .orElseThrow(() -> new RuntimeException("Animal no encontrado"));
-        adopcion.setUsuario(u);
-        adopcion.setAnimal(a);
+
+        Adopcion adopcion = new Adopcion();
+        adopcion.setUsuario(usuario);
+        adopcion.setAnimal(animal);
         adopcion.setFechaSolicitud(LocalDateTime.now());
+        adopcion.setFechaAprobacion(null);
         adopcion.setComentarios(comentarios);
         adopcion.setEstado(Adopcion.EstadoSolicitud.PENDIENTE);
         adopcion.setDeleted(false);
@@ -83,5 +83,9 @@ public class AdopcionServicio {
                 .orElseThrow(() -> new RuntimeException("Adopción no encontrada"));
         adopcion.setDeleted(true);
         adopcionRepositorio.save(adopcion);
+    }
+
+    public List<Adopcion> obtenerSolicitudesPorEmpresa(Long empresaId) {
+        return adopcionRepositorio.findByEmpresaIdAndDeletedFalse(empresaId);
     }
 }

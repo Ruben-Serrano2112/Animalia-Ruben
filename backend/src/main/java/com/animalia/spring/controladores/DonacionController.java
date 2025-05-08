@@ -47,6 +47,12 @@ public class DonacionController {
         return ResponseEntity.ok(donacionServicio.obtenerTotalDonacionesPorEmpresa(empresaId));
     }
 
+    @GetMapping("/todas")
+    @Operation(summary = "Obtener todas las donaciones", description = "Lista todas las donaciones registradas")
+    public ResponseEntity<List<Donacion>> obtenerTodasLasDonaciones() {
+        return ResponseEntity.ok(donacionServicio.obtenerTodasLasDonaciones());
+    }
+
     @DeleteMapping("/{id}")
     @Operation(summary = "Eliminar donación", description = "Elimina una donación por su ID")
     public ResponseEntity<Void> eliminarDonacion(@PathVariable Long id) {

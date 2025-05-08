@@ -1,0 +1,62 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Realizar una donación</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()"><ion-icon name="close"></ion-icon></ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <form [formGroup]="donationForm" (ngSubmit)="submitDonation()">
+    <ion-item>
+      <ion-label position="stacked">Selecciona una empresa</ion-label>
+      <ion-select formControlName="empresaId" interface="action-sheet">
+        <ion-select-option *ngFor="let empresa of filteredEmpresas" [value]="empresa.id">
+          {{ empresa.nombre }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <div class="amount-buttons">
+      <ion-button
+        *ngFor="let amount of predefinedAmounts"
+        [fill]="selectedAmount === amount.toString() ? 'solid' : 'outline'"
+        (click)="selectAmount(amount)">
+        {{ amount }}€
+      </ion-button>
+    </div>
+
+    <ion-item>
+      <ion-label position="stacked">Cantidad personalizada (€)</ion-label>
+      <ion-input
+        type="number"
+        formControlName="monto"
+        [value]="selectedAmount === 'custom' ? '' : selectedAmount">
+      </ion-input>
+    </ion-item>
+
+    <ion-list>
+      <ion-radio-group formControlName="metodoPago">
+        <ion-list-header>
+          <ion-label>Método de pago</ion-label>
+        </ion-list-header>
+        <ion-item *ngFor="let method of paymentMethods">
+          <ion-label>
+            <ion-icon [name]="method.icon"></ion-icon>
+            {{ method.name }}
+          </ion-label>
+          <ion-radio [value]="method.id"></ion-radio>
+        </ion-item>
+      </ion-radio-group>
+    </ion-list>
+
+    <ion-item>
+      <ion-label position="stacked">Comentario (opcional)</ion-label>
+      <ion-textarea formControlName="comentario" rows="3"></ion-textarea>
+    </ion-item>
+
+    <ion-button expand="block" type="submit" [disabled]="!donationForm.valid">
+      Donar
+    </ion-button>
+  </form>
+</ion-content>

@@ -36,10 +36,11 @@
           </ion-item>
 
           <div class="ion-padding">
-            <ion-button expand="block" type="submit" [disabled]="!adoptionForm.valid">
-              Enviar Solicitud
+            <ion-button expand="block" type="submit" [disabled]="!adoptionForm.valid || isLoading" (click)="submitForm()">
+              <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
+              <span *ngIf="!isLoading">Enviar Solicitud</span>
             </ion-button>
-            <ion-button expand="block" color="medium" type="button" (click)="dismiss()">
+            <ion-button expand="block" color="medium" type="button" [disabled]="isLoading" (click)="dismiss()">
               Cancelar
             </ion-button>
           </div>

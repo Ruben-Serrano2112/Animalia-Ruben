@@ -53,7 +53,11 @@ const routes: Routes = [
   {
     path: 'adopciones',
     loadChildren: () => import('./adopciones/adopciones.module').then(m => m.AdopcionesPageModule)
+  },  {
+    path: 'adopciones-empresa',
+    loadChildren: () => import('./adopciones-empresa/adopciones-empresa.module').then( m => m.AdopcionesEmpresaPageModule)
   }
+
 ];
 @NgModule({
   imports: [

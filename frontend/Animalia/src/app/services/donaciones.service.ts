@@ -26,4 +26,12 @@ export class DonacionesService {
   obtenerTotalDonacionesPorEmpresa(empresaId: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/empresa/${empresaId}/total`);
   }
+
+  obtenerDonacionesPorUsuario(usuarioId: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/usuario/${usuarioId}`);
+  }
+
+  obtenerTodasLasDonaciones(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/todas`);
+  }
 }

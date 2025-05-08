@@ -38,4 +38,8 @@ export class UsuarioService {
       observe: 'response'
     });
   }
+
+  getEmpresaIdByUsuarioId(usuarioId: string): Observable<number> {
+    return this.http.get<number>(`${this.apiUrl}/${usuarioId}/empresa`, { responseType: 'text' as 'json' });
+  }
 }

@@ -50,4 +50,8 @@ public class DonacionServicio {
     public List<Donacion> obtenerDonacionesRecientes() {
         return donacionRepositorio.findRecentDonations();
     }
+
+    public List<Donacion> obtenerTodasLasDonaciones() {
+        return donacionRepositorio.findAll().stream().filter(d -> !d.isDeleted()).toList();
+    }
 }

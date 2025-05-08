@@ -136,11 +136,26 @@ export class AdopcionesPage implements OnInit {
   }
 
   async iniciarAdopcion(animal: any) {
+    console.log('AdopcionesPage - iniciarAdopcion - Starting with animal:', animal);
+    console.log('AdopcionesPage - iniciarAdopcion - Current userId:', this.userId);
+
     if (!this.userId) {
+      console.error('AdopcionesPage - iniciarAdopcion - No userId found');
       this.mostrarMensaje('Debes iniciar sesión para solicitar una adopción', 'warning');
       this.router.navigate(['/IniciarSesion']);
       return;
     }
+
+    if (!animal || !animal.id) {
+      console.error('AdopcionesPage - iniciarAdopcion - Invalid animal data:', animal);
+      this.mostrarMensaje('Error: Animal no válido', 'danger');
+      return;
+    }
+
+    console.log('AdopcionesPage - iniciarAdopcion - Opening modal with data:', {
+      animal: animal,
+      userId: this.userId
+    });
 
     const modal = await this.modalController.create({
       component: AdopcionModalComponent,
@@ -154,20 +169,19 @@ export class AdopcionesPage implements OnInit {
     await modal.present();
 
     const { data } = await modal.onWillDismiss();
+    console.log('AdopcionesPage - iniciarAdopcion - Modal dismissed with data:', data);
+
     if (data?.adopted) {
+      console.log('AdopcionesPage - iniciarAdopcion - Reloading animals list');
       this.cargarAnimalesDisponibles();
     }
   }
 
   async submitAdoptionForm() {
     if (this.adoptionForm.valid && this.selectedAnimal && this.userId) {
-      const formData = {
-        comentarios: this.adoptionForm.get('comentarios')?.value,
-        usuarioId: this.userId,
-        animalId: this.selectedAnimal.id
-      };
+      const comentarios = this.adoptionForm.get('comentarios')?.value;
 
-      this.animalesService.solicitarAdopcion(this.selectedAnimal.id, this.userId).subscribe(
+      this.animalesService.solicitarAdopcion(this.selectedAnimal.id, this.userId, comentarios).subscribe(
         async (response) => {
           this.mostrarMensaje('Solicitud de adopción enviada correctamente', 'success');
           this.adoptionForm.reset();

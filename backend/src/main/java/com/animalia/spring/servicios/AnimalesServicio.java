@@ -49,7 +49,7 @@ public class AnimalesServicio {
     }
 
     public List<Animales> obtenerAnimalesDisponiblesAdopcion() {
-        return animalesRepositorio.findByEstadoAdopcionAndDeletedFalse(Animales.EstadoAdopcion.DISPONIBLE);
+        return animalesRepositorio.findByEstadoAdopcionAndDeletedFalseAndIsDomesticoTrue(Animales.EstadoAdopcion.DISPONIBLE);
     }
 
     public Animales solicitarAdopcion(Long animalId, Long usuarioId) {
@@ -59,5 +59,16 @@ public class AnimalesServicio {
             return animalesRepositorio.save(animal);
         }
         throw new RuntimeException("Animal no disponible para adopción");
+    }
+
+    public List<Animales> obtenerAnimalesPorEmpresa(Long empresaId) {
+        return animalesRepositorio.findByEmpresaIdAndDeletedFalse(empresaId);
+    }
+
+    public Animales actualizarDomesticoYEstado(Long animalId, boolean isDomestico, Animales.EstadoAdopcion estadoAdopcion) {
+        Animales animal = animalesRepositorio.findById(animalId).orElseThrow(() -> new RuntimeException("Animal no encontrado"));
+        animal.setDomestico(isDomestico);
+        animal.setEstadoAdopcion(estadoAdopcion);
+        return animalesRepositorio.save(animal);
     }
 }
