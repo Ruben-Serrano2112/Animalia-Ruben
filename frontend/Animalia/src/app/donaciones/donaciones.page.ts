@@ -26,7 +26,7 @@ export class DonacionesPage implements OnInit {
   filteredEmpresas: any[] = [];
   selectedTipo: string | null = null;
 
-  // Paginación
+
   totalEmpresas: number = 0;
   totalPages: number = 0;
   currentPage: number = 0;
@@ -63,7 +63,7 @@ export class DonacionesPage implements OnInit {
       metodoPago: ['TARJETA_CREDITO', Validators.required],
       comentario: [''],
       empresaId: ['', Validators.required],
-      usuarioId: [1] // Temporal: Deberías obtener el ID del usuario logueado
+      usuarioId: [1]
     });
   }
 
@@ -228,7 +228,6 @@ export class DonacionesPage implements OnInit {
   async cargarDonacionesEmpresa(empresaId: number) {
     this.donacionesService.obtenerDonacionesPorEmpresa(empresaId).subscribe(async (donaciones) => {
       console.log('Donaciones recibidas:', donaciones);
-      // Para cada donación, obtener el nombre del usuario donante
       this.donacionesEmpresa = await Promise.all(donaciones.map(async (donacion: any) => {
         let usuarioNombre = '';
         if (donacion.usuarioId) {
@@ -271,7 +270,6 @@ export class DonacionesPage implements OnInit {
 
   cargarTodasLasDonaciones() {
     this.donacionesService.obtenerTodasLasDonaciones().subscribe(async (donaciones) => {
-      // Obtener nombres de usuario y empresa para cada donación
       this.donacionesAdmin = await Promise.all(donaciones.map(async (donacion: any) => {
         let usuarioNombre = '';
         let empresaNombre = '';

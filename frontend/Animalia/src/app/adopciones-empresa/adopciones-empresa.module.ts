@@ -13,8 +13,9 @@ import { AdopcionesEmpresaPage } from './adopciones-empresa.page';
     CommonModule,
     FormsModule,
     IonicModule,
-    AdopcionesEmpresaPageRoutingModule
+    AdopcionesEmpresaPageRoutingModule,
+    AdopcionesEmpresaPage
   ],
-  declarations: [AdopcionesEmpresaPage]
+  declarations: []
 })
 export class AdopcionesEmpresaPageModule {}

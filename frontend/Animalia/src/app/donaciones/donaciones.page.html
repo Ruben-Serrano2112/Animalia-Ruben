@@ -5,7 +5,7 @@
 </ion-header>
 
 <ion-content>
-  <!-- Vista de donaciones recibidas para empresas -->
+
   <ng-container *ngIf="isEmpresa && showDonations">
     <ion-card class="donaciones-recientes-card" *ngIf="donacionesEmpresa.length > 0">
       <ion-card-header>
@@ -30,7 +30,7 @@
     </ion-fab>
   </ng-container>
 
-  <!-- Formulario de donación (oculto para empresa y admin por defecto, pero visible si showFormModal) -->
+
   <ng-container *ngIf="showFormModal || (!isEmpresa && !isAdmin && !showUserDonations)">
     <ion-card class="proceso-card">
       <ion-card-header>
@@ -38,7 +38,7 @@
       </ion-card-header>
       <ion-card-content>
         <form [formGroup]="donationForm" (ngSubmit)="submitDonation()">
-          <!-- Selección de empresa -->
+
           <ion-item>
             <ion-label position="stacked">Selecciona una empresa</ion-label>
             <ion-select formControlName="empresaId" interface="action-sheet">
@@ -48,7 +48,7 @@
             </ion-select>
           </ion-item>
 
-          <!-- Cantidad de donación -->
+
           <div class="amount-buttons">
             <ion-button
               *ngFor="let amount of predefinedAmounts"
@@ -83,7 +83,7 @@
             </ion-radio-group>
           </ion-list>
 
-          <!-- Comentario -->
+
           <ion-item>
             <ion-label position="stacked">Comentario (opcional)</ion-label>
             <ion-textarea formControlName="comentario" rows="3"></ion-textarea>
@@ -103,7 +103,6 @@
     </ion-card>
   </ng-container>
 
-  <!-- Lista de donaciones del usuario -->
   <ng-container *ngIf="showUserDonations && !isEmpresa">
     <ion-card class="donaciones-recientes-card">
       <ion-card-header>
@@ -129,7 +128,6 @@
     </ion-card>
   </ng-container>
 
-  <!-- Vista de donaciones para ADMIN -->
   <ng-container *ngIf="isAdmin && showAdminDonations">
     <ion-card class="donaciones-recientes-card">
       <ion-card-header>
@@ -158,6 +156,4 @@
     </ion-fab>
   </ng-container>
 
-  <!-- Donaciones recientes para usuarios normales -->
-  <!-- (Eliminado el bloque de donaciones recientes para usuarios normales) -->
 </ion-content>

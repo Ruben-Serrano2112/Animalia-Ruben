@@ -1,179 +1,231 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-title>Adopciones</ion-title>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>{{ userRol === 'EMPRESA' ? 'Gestión de Adopciones' : 'Adopciones' }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <ion-card class="proceso-card" *ngIf="!showAdoptionForm">
-    <ion-card-header>
-      <ion-card-title>Proceso de Adopción</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-list>
-        <ion-item>
-          <ion-label>
-            <h2>Paso 1: Formulario de Adopción</h2>
-            <p>Complete el formulario con sus datos personales</p>
-          </ion-label>
-        </ion-item>
-        <ion-item>
-          <ion-label>
-            <h2>Paso 2: Entrevista</h2>
-            <p>Programe una entrevista con el refugio</p>
-          </ion-label>
-        </ion-item>
-        <ion-item>
-          <ion-label>
-            <h2>Paso 3: Visita al Animal</h2>
-            <p>Conozca al animal que desea adoptar</p>
-          </ion-label>
-        </ion-item>
-      </ion-list>
+<ion-content class="ion-padding">
+  <!-- Loading Indicator -->
+  <div *ngIf="loading" class="ion-text-center ion-padding-vertical">
+    <ion-spinner name="circles" color="primary"></ion-spinner>
+    <p>Cargando...</p>
+  </div>
+
+  <!-- Error Message -->
+  <ion-card *ngIf="error && !loading" color="light" class="ion-margin-bottom">
+    <ion-card-content color="danger" class="ion-padding d-flex align-items-center">
+      <ion-icon name="alert-circle-outline" slot="start" class="ion-margin-end"></ion-icon>
+      {{ error }}
     </ion-card-content>
   </ion-card>
 
-  <!-- Formulario de Adopción -->
-  <ion-card *ngIf="showAdoptionForm" class="adoption-form-card">
-    <ion-card-header>
-      <ion-card-title>Formulario de Adopción</ion-card-title>
-      <ion-card-subtitle>Para {{ selectedAnimal?.nombre_comun }}</ion-card-subtitle>
-    </ion-card-header>
-    <ion-card-content>
-      <form [formGroup]="adoptionForm" (ngSubmit)="submitAdoptionForm()">
-        <ion-item>
-          <ion-label position="stacked">Nombre *</ion-label>
-          <ion-input formControlName="nombre" type="text"></ion-input>
-        </ion-item>
+  <!-- View for Standard Users (USER, ADMIN, etc.) -->
+  <ng-container *ngIf="!loading && !error && userRol !== 'EMPRESA'">
+    <ion-card class="proceso-card ion-margin-bottom">
+      <ion-card-header>
+        <ion-card-title class="ion-text-center">Proceso de Adopción</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list lines="none">
+          <ion-item>
+            <ion-icon name="document-text-outline" slot="start" color="secondary"></ion-icon>
+            <ion-label>
+              <h2>Paso 1: Solicitar Adopción</h2>
+              <p>Encuentra un animal y envía tu solicitud con tus comentarios.</p>
+            </ion-label>
+          </ion-item>
+          <ion-item>
+            <ion-icon name="chatbubbles-outline" slot="start" color="secondary"></ion-icon>
+            <ion-label>
+              <h2>Paso 2: Entrevista</h2>
+              <p>El refugio se pondrá en contacto para una entrevista.</p>
+            </ion-label>
+          </ion-item>
+          <ion-item>
+            <ion-icon name="paw-outline" slot="start" color="secondary"></ion-icon>
+            <ion-label>
+              <h2>Paso 3: Visita y Adopción</h2>
+              <p>Conoce al animal y finaliza el proceso.</p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
 
-        <ion-item>
-          <ion-label position="stacked">Apellidos *</ion-label>
-          <ion-input formControlName="apellidos" type="text"></ion-input>
-        </ion-item>
+    <div>
+      <ion-searchbar class="sticky-top ion-margin-bottom" [debounce]="500" (ionInput)="handleInput($event)" placeholder="Buscar animal por nombre..."></ion-searchbar>
 
-        <ion-item>
-          <ion-label position="stacked">Teléfono *</ion-label>
-          <ion-input formControlName="telefono" type="tel"></ion-input>
-        </ion-item>
-
-        <ion-item>
-          <ion-label position="stacked">Email *</ion-label>
-          <ion-input formControlName="email" type="email"></ion-input>
-        </ion-item>
-
-        <ion-item>
-          <ion-label position="stacked">Dirección *</ion-label>
-          <ion-textarea formControlName="direccion" rows="2"></ion-textarea>
-        </ion-item>
-
-        <ion-item>
-          <ion-label position="stacked">¿Por qué deseas adoptar? *</ion-label>
-          <ion-textarea formControlName="motivo" rows="4" placeholder="Explica tus motivos (mínimo 50 caracteres)"></ion-textarea>
-        </ion-item>
-
-        <ion-item>
-          <ion-label>¿Tienes experiencia con mascotas?</ion-label>
-          <ion-checkbox formControlName="experienciaPrevia" slot="start"></ion-checkbox>
-        </ion-item>
-
-        <ion-item>
-          <ion-label>¿Tienes otras mascotas?</ion-label>
-          <ion-checkbox formControlName="tieneOtrasMascotas" slot="start"></ion-checkbox>
-        </ion-item>
-
-        <ion-item>
-          <ion-label class="ion-text-wrap">Acepto los términos y condiciones de adopción *</ion-label>
-          <ion-checkbox formControlName="aceptaTerminos" slot="start"></ion-checkbox>
-        </ion-item>
-
-        <div class="form-buttons">
-          <ion-button type="button" color="medium" (click)="cancelarAdopcion()">
-            Cancelar
-          </ion-button>
-          <ion-button type="submit" [disabled]="!adoptionForm.valid">
-            Enviar Solicitud
-          </ion-button>
-        </div>
-      </form>
-    </ion-card-content>
-  </ion-card>
-
-  <!-- Lista de Animales -->
-  <div *ngIf="!showAdoptionForm">
-    <ion-searchbar class="sticky-top" [debounce]="1000" (ionInput)="handleInput($event)"></ion-searchbar>
-
-    <ion-accordion-group expand="inset">
-      <ion-accordion value="first">
-        <ion-item slot="header" class="caracteristicas" [ngClass]="'selected'">
-          <ion-label>Categorías</ion-label>
-        </ion-item>
-
-        <div class="ion-padding p-0 m-0" slot="content">
-          <ion-item id="elementos">
-            <ion-list class="d-flex flex-column row w-100">
-              <ion-item class="w-100 m-0 p-0" lines="none">
-                <ion-button (click)="cambioFamilia('MAMIFERO')" shape="round"
-                  class="col w-100 h-75 animal_button fs-6 fw-bold" fill="outline"
-                  [ngClass]="{'selected': isFamiliaSelected('MAMIFERO')}">Mamíferos</ion-button>
-                <ion-button (click)="cambioFamilia('AVES')" shape="round"
-                  class="col w-100 h-75 animal_button fs-6 fw-bold" fill="outline"
-                  [ngClass]="{'selected': isFamiliaSelected('AVES')}">Aves</ion-button>
+      <ion-accordion-group expand="inset" class="ion-margin-bottom">
+        <ion-accordion value="categorias">
+          <ion-item slot="header" color="light">
+            <ion-label>Filtrar por Categoría</ion-label>
+          </ion-item>
+          <div class="ion-padding" slot="content">
+            <ion-list lines="none">
+              <ion-item button (click)="cambioFamilia('MAMIFERO')" [class.selected-filter]="isFamiliaSelected('MAMIFERO')">
+                <ion-label>Mamíferos</ion-label>
+                <ion-icon name="checkmark-circle" slot="end" color="primary" *ngIf="isFamiliaSelected('MAMIFERO')"></ion-icon>
               </ion-item>
-
-              <ion-item class="w-100 m-0 p-0" lines="none">
-                <ion-button (click)="cambioFamilia('ANFIBIO')" shape="round"
-                  class="col w-100 h-75 animal_button fs-6 fw-bold" fill="outline"
-                  [ngClass]="{'selected': isFamiliaSelected('ANFIBIO')}">Anfíbios</ion-button>
-                <ion-button (click)="cambioFamilia('REPTIL')" shape="round"
-                  class="col w-100 h-75 animal_button fs-6 fw-bold" fill="outline"
-                  [ngClass]="{'selected': isFamiliaSelected('REPTIL')}">Reptiles</ion-button>
+              <ion-item button (click)="cambioFamilia('AVES')" [class.selected-filter]="isFamiliaSelected('AVES')">
+                <ion-label>Aves</ion-label>
+                <ion-icon name="checkmark-circle" slot="end" color="primary" *ngIf="isFamiliaSelected('AVES')"></ion-icon>
               </ion-item>
-
-              <ion-item class="w-100 m-0 p-0" lines="none">
-                <ion-button (click)="cambioFamilia('PECES')" shape="round"
-                  class="col w-100 h-75 animal_button fs-6 fw-bold" fill="outline"
-                  [ngClass]="{'selected': isFamiliaSelected('PECES')}">Marinos</ion-button>
+              <ion-item button (click)="cambioFamilia('ANFIBIO')" [class.selected-filter]="isFamiliaSelected('ANFIBIO')">
+                <ion-label>Anfibios</ion-label>
+                <ion-icon name="checkmark-circle" slot="end" color="primary" *ngIf="isFamiliaSelected('ANFIBIO')"></ion-icon>
+              </ion-item>
+              <ion-item button (click)="cambioFamilia('REPTIL')" [class.selected-filter]="isFamiliaSelected('REPTIL')">
+                <ion-label>Reptiles</ion-label>
+                <ion-icon name="checkmark-circle" slot="end" color="primary" *ngIf="isFamiliaSelected('REPTIL')"></ion-icon>
+              </ion-item>
+              <ion-item button (click)="cambioFamilia('PECES')" [class.selected-filter]="isFamiliaSelected('PECES')">
+                <ion-label>Marinos</ion-label>
+                <ion-icon name="checkmark-circle" slot="end" color="primary" *ngIf="isFamiliaSelected('PECES')"></ion-icon>
+              </ion-item>
+               <ion-item button (click)="cambioFamilia(null)" *ngIf="selectedFamilia">
+                <ion-label color="medium">Limpiar filtro</ion-label>
               </ion-item>
             </ion-list>
-          </ion-item>
-        </div>
-      </ion-accordion>
-    </ion-accordion-group>
+          </div>
+        </ion-accordion>
+      </ion-accordion-group>
 
-    <ion-list>
-      <ion-item *ngFor="let animal of paginaActual" class="animal-item">
-        <ion-thumbnail slot="start">
-          <ion-img [src]="getImagen(animal)" [alt]="animal.nombre_comun"></ion-img>
-        </ion-thumbnail>
-        <ion-label>
-          <h2>{{ animal.nombre_comun }}</h2>
-          <p>Estado de Conservación: {{ animal.estado_conservacion }}</p>
-        </ion-label>
-        <div class="button-container">
-          <ion-button expand="block" color="primary" (click)="verDetalles(animal.id, 'animal')">
-            VER DETALLES
+      <div *ngIf="filteredAnimalesUsuario.length === 0 && !loading" class="ion-padding ion-text-center">
+          <ion-icon name="sad-outline" size="large" color="medium"></ion-icon>
+          <p>No hay animales que coincidan con tu búsqueda o filtro.</p>
+      </div>
+
+      <ion-list *ngIf="filteredAnimalesUsuario.length > 0">
+        <ion-card *ngFor="let animal of paginaActualUsuario" class="animal-item ion-margin-bottom">
+          <img [src]="getImagen(animal)" [alt]="animal.nombre_comun" class="animal-image" (error)="handleImageError($event, 'assets/img/logo1.jpg')"/>
+          <ion-card-header>
+            <ion-card-title>{{ animal.nombre_comun }}</ion-card-title>
+            <ion-card-subtitle>Familia: {{ animal.familia }}</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <p><strong>Estado de Conservación:</strong> {{ animal.estado_conservacion }}</p>
+            <ion-buttons fill="clear" class="ion-justify-content-end ion-padding-top">
+              <ion-button color="tertiary" (click)="verDetalles(animal.id, 'animal')">
+                <ion-icon name="eye-outline" slot="start"></ion-icon>
+                Ver Detalles
+              </ion-button>
+              <ion-button color="success" (click)="iniciarAdopcion(animal)">
+                <ion-icon name="heart-outline" slot="start"></ion-icon>
+                Solicitar Adopción
+              </ion-button>
+            </ion-buttons>
+          </ion-card-content>
+        </ion-card>
+      </ion-list>
+    </div>
+
+    <ion-footer *ngIf="filteredAnimalesUsuario.length > 0 && totalPagesUsuario > 1">
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-button (click)="prevPage()" [disabled]="currentPageUsuario === 0">
+            <ion-icon slot="icon-only" name="arrow-back-circle-outline"></ion-icon>
           </ion-button>
-          <ion-button expand="block" color="success" (click)="iniciarAdopcion(animal)">
-            SOLICITAR ADOPCIÓN
+        </ion-buttons>
+        <ion-title class="ion-text-center">Página {{ currentPagehtmlUsuario }} de {{ totalPagesUsuario }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="nextPage()" [disabled]="currentPagehtmlUsuario >= totalPagesUsuario">
+            <ion-icon slot="icon-only" name="arrow-forward-circle-outline"></ion-icon>
           </ion-button>
-        </div>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-footer>
+  </ng-container>
+
+  <!-- View for Company Users (EMPRESA) -->
+  <ng-container *ngIf="!loading && !error && userRol === 'EMPRESA'">
+    <ion-segment [(ngModel)]="segmentModel" (ionChange)="segmentChanged($event)" color="secondary" class="ion-margin-top ion-margin-bottom">
+      <ion-segment-button value="animales">
+        <ion-icon name="paw-outline"></ion-icon>
+        <ion-label>Gestionar Animales</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="solicitudes">
+        <ion-icon name="document-text-outline"></ion-icon>
+        <ion-label>Gestionar Solicitudes</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+
+    <div *ngIf="segmentModel === 'animales'">
+      <ion-item lines="full" class="ion-margin-bottom">
+        <ion-label>Mostrar solo disponibles para adopción</ion-label>
+        <ion-toggle slot="end" [(ngModel)]="mostrarSoloEnAdopcion" (ionChange)="toggleListaAnimalesAdopcion()"></ion-toggle>
       </ion-item>
-    </ion-list>
-  </div>
-</ion-content>
+      <div *ngIf="getAnimalesParaMostrarEmpresa().length === 0 && !loading" class="ion-padding ion-text-center">
+        <ion-icon name="sad-outline" size="large" color="medium"></ion-icon>
+        <p>No hay animales para mostrar según el filtro.</p>
+      </div>
+      <ion-list *ngIf="getAnimalesParaMostrarEmpresa().length > 0">
+        <ion-card *ngFor="let animal of getAnimalesParaMostrarEmpresa()" class="ion-margin-bottom">
+          <img [src]="getImagen(animal)" [alt]="animal.nombre_comun" class="animal-image-empresa" (error)="handleImageError($event, 'assets/img/logo1.jpg')"/>
+          <ion-card-header>
+            <ion-card-title>{{ animal.nombre_comun }}</ion-card-title>
+            <ion-card-subtitle>{{ animal.especie }}</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-list lines="none">
+              <ion-item></ion-item>
+                <ion-label><strong>ID:</strong></ion-label>
+                <ion-note slot="end">{{ animal.id }}</ion-note>
+              </ion-item>
+              <ion-item>
+                <ion-label><strong>Doméstico:</strong></ion-label>
+                <ion-toggle slot="end" [checked]="animal.isDomestico" (ionChange)="cambiarDomestico(animal, $event.detail.checked)"></ion-toggle>
+              </ion-item>
+              <ion-item>
+                <ion-label><strong>Estado Adopción:</strong></ion-label>
+                <ion-select slot="end" [(ngModel)]="animal.estadoAdopcion" (ionChange)="cambiarEstadoAdopcion(animal, $event.detail.value)" interface="action-sheet">
+                  <ion-select-option value="DISPONIBLE">Disponible</ion-select-option>
+                  <ion-select-option value="EN_PROCESO">En Proceso</ion-select-option>
+                  <ion-select-option value="ADOPTADO">Adoptado</ion-select-option>
+                  <ion-select-option value="NO_DISPONIBLE">No Disponible</ion-select-option>
+                </ion-select>
+              </ion-item>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+      </ion-list>
+    </div>
 
-<ion-footer *ngIf="!showAdoptionForm">
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-button (click)="prevPage()" [disabled]="currentPage === 0">
-        Anterior
-      </ion-button>
-    </ion-buttons>
-    <ion-title class="ion-text-center">Página {{ currentPagehtml }} de {{ totalPages }}</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="nextPage()" [disabled]="currentPage+1 >= totalPages">
-        Siguiente
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-footer>
+    <div *ngIf="segmentModel === 'solicitudes'">
+      <div *ngIf="solicitudes.length === 0 && !loading" class="ion-padding ion-text-center">
+          <ion-icon name="file-tray-outline" size="large" color="medium"></ion-icon>
+          <p>No hay solicitudes de adopción pendientes.</p>
+      </div>
+      <ion-list *ngIf="solicitudes.length > 0">
+        <ion-card *ngFor="let solicitud of solicitudes" class="ion-margin-bottom">
+          <ion-card-header>
+            <ion-card-title>Solicitud #{{ solicitud.id }}</ion-card-title>
+            <ion-card-subtitle>Animal: {{ solicitud.animal?.nombre_comun || 'No especificado' }} (ID: {{solicitud.animal?.id}}) </ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <p><strong>Solicitante ID:</strong> {{ solicitud.usuario?.id || 'No especificado' }}</p>
+            <p><strong>Fecha Solicitud:</strong> {{ solicitud.fechaSolicitud | date:'dd/MM/yyyy HH:mm' }}</p>
+            <p><strong>Estado Actual:</strong> <ion-chip [color]="solicitud.estado === 'APROBADA' ? 'success' : (solicitud.estado === 'RECHAZADA' ? 'danger' : 'warning')">{{ solicitud.estado }}</ion-chip></p>
+            <p class="ion-padding-top"><strong>Comentarios del solicitante:</strong></p>
+            <p>{{ solicitud.comentarios }}</p>
+            <div *ngIf="solicitud.estado === 'PENDIENTE'" class="ion-padding-top ion-text-right">
+              <ion-button fill="outline" color="success" (click)="responderSolicitud(solicitud, 'APROBADA')" class="ion-margin-end">
+                <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+                Aprobar
+              </ion-button>
+              <ion-button fill="outline" color="danger" (click)="responderSolicitud(solicitud, 'RECHAZADA')">
+                <ion-icon name="close-circle-outline" slot="start"></ion-icon>
+                Rechazar
+              </ion-button>
+            </div>
+            <div *ngIf="solicitud.estado !== 'PENDIENTE'" class="ion-padding-top">
+              <p><em>Esta solicitud ya ha sido procesada.</em></p>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-list>
+    </div>
+  </ng-container>
+</ion-content>

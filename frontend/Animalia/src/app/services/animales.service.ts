@@ -30,17 +30,22 @@ export class AnimalesService {
     return this.http.get<any>(`${this.apiUrl}/animales/disponibles-adopcion`);
   }
 
-  solicitarAdopcion(animalId: number, usuarioId: number, comentarios: string): Observable<any> {
+  solicitarAdopcion(
+    animalId: number,
+    usuarioId: number,
+    comentarios: string,
+    // aceptaTerminos is usually client-side, but can be passed if needed by backend
+  ): Observable<any> {
     console.log('AnimalesService - solicitarAdopcion - Input:', {
       animalId,
       usuarioId,
-      comentarios
+      comentarios,
     });
 
     const adopcionData = {
       animal_id: animalId,
       usuario_id: usuarioId,
-      comentarios: comentarios,
+      comentarios: comentarios, // This field was already present
       estado: 'PENDIENTE',
       deleted: false
     };

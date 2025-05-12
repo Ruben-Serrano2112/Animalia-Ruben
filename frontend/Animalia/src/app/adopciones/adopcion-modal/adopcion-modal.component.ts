@@ -83,7 +83,19 @@ export class AdopcionModalComponent implements OnInit {
         comentarios: comentarios
       });
 
-      this.animalesService.solicitarAdopcion(this.animal.id, this.userId, comentarios).subscribe({
+      this.animalesService.solicitarAdopcion(
+        this.animal.id,            // animalId
+        this.userId,               // usuarioId
+        comentarios,               // comentarios
+        '',                        // nombre (placeholder)
+        '',                        // apellidos (placeholder)
+        '',                        // telefono (placeholder)
+        '',                        // email (placeholder)
+        '',                        // direccion (placeholder)
+        '',                        // motivo (placeholder)
+        false,                     // experienciaPrevia (placeholder)
+        false                      // tieneOtrasMascotas (placeholder)
+      ).subscribe({
         next: (response) => {
           console.log('AdopcionModalComponent - submitForm - Success response:', response);
           this.mostrarMensaje('Solicitud de adopción enviada correctamente', 'success');

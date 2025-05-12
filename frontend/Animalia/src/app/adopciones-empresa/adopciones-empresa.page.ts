@@ -1,40 +1,128 @@
 import { Component, OnInit } from '@angular/core';
 import { AdopcionesService } from '../services/adopciones.service';
-import { ToastController } from '@ionic/angular';
+import { UsuarioService } from '../services/usuario.service'; // Importar UsuarioService
+import { ToastController, IonicModule, LoadingController } from '@ionic/angular'; // Importar LoadingController
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router'; // Importar Router
 
 @Component({
   selector: 'app-adopciones-empresa',
   templateUrl: './adopciones-empresa.page.html',
   styleUrls: ['./adopciones-empresa.page.scss'],
+  standalone: true,
+  imports: [IonicModule, CommonModule, FormsModule]
 })
 export class AdopcionesEmpresaPage implements OnInit {
-  empresaId = 1; // TODO: Reemplazar por el id real del usuario logueado
+  empresaId: number = 0; // Inicializar empresaId
   animales: any[] = [];
   solicitudes: any[] = [];
   animalesConSolicitudes: any[] = [];
-  loading = false;
+  public loading: boolean = false; // Added public loading property
+  private loadingElement: HTMLIonLoadingElement | null = null; // Added for LoadingController
+  segmentModel = 'animales'; // Añadir si se eliminó
+  mostrarSoloEnAdopcion = false; // Añadir si se eliminó
+  error: string = ''; // Para mostrar errores en la UI
 
   constructor(
     private adopcionesService: AdopcionesService,
-    private toastCtrl: ToastController
+    private usuarioService: UsuarioService, // Inyectar UsuarioService
+    private toastCtrl: ToastController,
+    private loadingController: LoadingController, // Inyectar LoadingController
+    private router: Router // Inyectar Router
   ) {}
 
-  ngOnInit() {
-    this.cargarDatos();
+  async ngOnInit() {
+    await this.presentLoading('Cargando datos de empresa...');
+    const userId = sessionStorage.getItem('id');
+
+    if (!userId) {
+      await this.dismissLoading();
+      this.mostrarToast('No se encontró información del usuario. Por favor, inicie sesión nuevamente.', 'danger');
+      this.router.navigate(['/perfil']); // O a la página de login
+      return;
+    }
+
+    try {
+      const empresaIdFromService = await this.usuarioService.getEmpresaIdByUsuarioId(userId).toPromise();
+      if (empresaIdFromService === null || empresaIdFromService === undefined) {
+        throw new Error('No se pudo obtener el ID de la empresa para el usuario.');
+      }
+      this.empresaId = Number(empresaIdFromService);
+
+      if (!this.empresaId) {
+        throw new Error('No se encontró una empresa asociada a este usuario o el ID no es válido.');
+      }
+
+      sessionStorage.setItem('empresaId', this.empresaId.toString());
+      await this.cargarDatos();
+    } catch (err: any) {
+      console.error('Error obteniendo datos de empresa:', err);
+      this.error = err.message || 'Error crítico cargando los datos de empresa.';
+      this.mostrarToast(this.error, 'danger');
+    } finally {
+      await this.dismissLoading();
+    }
+  }
+
+  async presentLoading(message: string) {
+    this.loading = true; // Set loading to true
+    if (this.loadingElement) {
+      await this.loadingElement.dismiss();
+    }
+    this.loadingElement = await this.loadingController.create({
+      message,
+      spinner: 'circles',
+    });
+    await this.loadingElement.present();
+  }
+
+  async dismissLoading() {
+    if (this.loadingElement) {
+      await this.loadingElement.dismiss();
+      this.loadingElement = null;
+    }
+    this.loading = false; // Set loading to false
   }
 
   async cargarDatos() {
-    this.loading = true;
+    // this.loading = true; // Controlado por ngOnInit
+    if (!this.empresaId) {
+      this.error = 'ID de empresa no disponible. No se pueden cargar los datos.';
+      this.mostrarToast(this.error, 'warning');
+      return;
+    }
     try {
       this.animales = (await this.adopcionesService.getAnimalesEmpresa(this.empresaId).toPromise()) || [];
       this.solicitudes = (await this.adopcionesService.getSolicitudesEmpresa(this.empresaId).toPromise()) || [];
       this.animalesConSolicitudes = this.animales.filter(animal =>
         this.solicitudes.some(sol => sol.animal.id === animal.id)
       );
-    } catch (err) {
-      this.mostrarToast('Error cargando datos', 'danger');
+      if (this.animales.length === 0 && this.solicitudes.length === 0) {
+        this.mostrarToast('No hay animales ni solicitudes para mostrar.', 'tertiary');
+      }
+    } catch (err: any) {
+      console.error('Error cargando datos específicos de la empresa:', err);
+      this.error = 'Error cargando animales/solicitudes: ' + (err.message || 'Error desconocido');
+      this.mostrarToast(this.error, 'danger');
     }
-    this.loading = false;
+    // this.loading = false; // Controlado por ngOnInit
+  }
+
+  // Añadir métodos de segmentación si se eliminaron
+  segmentChanged(ev: any) {
+    this.segmentModel = ev.detail.value;
+  }
+
+  toggleListaAnimalesAdopcion() {
+    this.mostrarSoloEnAdopcion = !this.mostrarSoloEnAdopcion;
+  }
+
+  getAnimalesParaMostrar() {
+    if (this.mostrarSoloEnAdopcion) {
+      return this.animales.filter(animal => animal.estadoAdopcion === 'DISPONIBLE');
+    }
+    return this.animales;
   }
 
   async cambiarDomestico(animal: any, value: boolean) {
@@ -54,6 +142,29 @@ export class AdopcionesEmpresaPage implements OnInit {
       this.mostrarToast('Actualizado correctamente', 'success');
     } catch (err) {
       this.mostrarToast('Error actualizando', 'danger');
+    }
+  }
+
+  async responderSolicitud(solicitud: any, nuevoEstado: string) { // Asegúrate que este método exista si es necesario
+    try {
+      // TEMPORALMENTE COMENTADO - ASEGÚRATE DE QUE ESTE MÉTODO EXISTA EN TU SERVICIO
+      // await this.adopcionesService.responderSolicitudAdopcion(solicitud.id, nuevoEstado).toPromise();
+      console.log(`Simulando respuesta a solicitud ${solicitud.id} con estado ${nuevoEstado}`);
+      // Simulación de la actualización para la UI
+      solicitud.estado = nuevoEstado;
+
+      if (nuevoEstado === 'APROBADA') {
+        const animal = this.animales.find(a => a.id === solicitud.animal.id);
+        if (animal) {
+          // await this.cambiarEstadoAdopcion(animal, 'EN_PROCESO'); // O 'ADOPTADO' según la lógica de negocio
+          console.log(`Simulando cambio de estado de animal ${animal.id} a EN_PROCESO`);
+          animal.estadoAdopcion = 'EN_PROCESO'; // Simulación para la UI
+        }
+      }
+      this.mostrarToast(`Solicitud ${nuevoEstado.toLowerCase()} (simulado) correctamente`, 'success');
+      // await this.cargarDatos(); // Considera si es necesario recargar todo o actualizar localmente
+    } catch (err: any) {
+      this.mostrarToast('Error al responder la solicitud (simulado): ' + (err.message || 'Error desconocido'), 'danger');
     }
   }
 

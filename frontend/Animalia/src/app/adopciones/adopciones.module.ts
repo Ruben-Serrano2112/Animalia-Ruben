@@ -5,7 +5,6 @@ import { IonicModule } from '@ionic/angular';
 import { AdopcionesPageRoutingModule } from './adopciones-routing.module';
 import { AdopcionesPage } from './adopciones.page';
 import { RouterModule } from '@angular/router';
-import { AdopcionModalComponent } from './adopcion-modal/adopcion-modal.component';
 
 @NgModule({
   imports: [
@@ -14,8 +13,7 @@ import { AdopcionModalComponent } from './adopcion-modal/adopcion-modal.componen
     ReactiveFormsModule,
     IonicModule,
     RouterModule,
-    AdopcionesPageRoutingModule,
-    AdopcionModalComponent
+    AdopcionesPageRoutingModule
   ],
   declarations: [AdopcionesPage]
 })

@@ -7,19 +7,18 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn; // Asegúrate de tener esta importación
+import jakarta.persistence.ManyToOne; // Asegúrate de tener esta importación
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+
 
 import java.util.Objects;
 
 @Entity
 @Data
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "animales")
@@ -67,6 +66,10 @@ public class Animales {
     @Enumerated(EnumType.STRING)
     private EstadoAdopcion estadoAdopcion = EstadoAdopcion.NO_DISPONIBLE;
     
+    @ManyToOne 
+    @JoinColumn(name = "empresa_id", nullable = true) 
+    private Empresas empresa;
+
     public enum EstadoAdopcion {
         DISPONIBLE, EN_PROCESO, ADOPTADO, NO_DISPONIBLE
     }
