@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { AnimalesService } from '../services/animales.service';
 import { Router } from '@angular/router';
-import { ToastController, ModalController, LoadingController, AlertController } from '@ionic/angular';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ToastController, ModalController, LoadingController } from '@ionic/angular';
 import { UsuarioService } from '../services/usuario.service';
 import { AdopcionesService } from '../services/adopciones.service';
+import { AdopcionModalComponent } from './adopcion-modal/adopcion-modal.component';
+import { EmpresasService } from '../services/empresas.service'; // Importar EmpresasService
 
 @Component({
   selector: 'app-adopciones',
@@ -24,6 +25,11 @@ export class AdopcionesPage implements OnInit {
   paginaActualUsuario: any[] = [];
 
   animalesGestionEmpresa: any[] = [];
+  animalesGestionAdmin: any[] = [];
+  solicitudesAdmin: any[] = [];
+  filteredAnimalesGestionAdmin: any[] = [];
+  mostrarSoloEnAdopcionAdmin = false;
+  todasLasEmpresas: any[] = []; // Nueva propiedad para almacenar todas las empresas
 
   userId: number | null = null;
   selectedFamilia: string | null = null;
@@ -37,6 +43,7 @@ export class AdopcionesPage implements OnInit {
   public loading: boolean = false;
   private loadingElement: HTMLIonLoadingElement | null = null;
   segmentModel = 'animales';
+  adminSegmentModel = 'solicitar';
   mostrarSoloEnAdopcion = false;
   error: string | null = null;
 
@@ -55,7 +62,7 @@ export class AdopcionesPage implements OnInit {
     private modalController: ModalController,
     private usuarioService: UsuarioService,
     private loadingCtrl: LoadingController,
-    private alertController: AlertController
+    private empresasService: EmpresasService // Inyectar EmpresasService
   ) {
     const userIdStr = sessionStorage.getItem('id');
     this.userId = userIdStr ? parseInt(userIdStr) : null;
@@ -64,6 +71,7 @@ export class AdopcionesPage implements OnInit {
 
   async ngOnInit() {
     await this.presentLoading('Cargando...');
+    this.userRol = sessionStorage.getItem('rol');
 
     if (this.userRol === 'EMPRESA') {
       const userIdForEmpresa = sessionStorage.getItem('id');
@@ -90,14 +98,75 @@ export class AdopcionesPage implements OnInit {
         if (this.error) this.mostrarMensaje(this.error, 'danger');
         await this.dismissLoading();
       }
+    } else if (this.userRol === 'ADMIN') {
+      this.cargarAnimalesDisponibles(); // Para la pestaña "Solicitar Adopción"
+      await this.cargarDatosAdmin(); // Carga animales y solicitudes para las otras pestañas de admin
     } else {
       this.cargarAnimalesDisponibles();
     }
   }
 
+  async cargarDatosAdmin() {
+    this.error = null;
+    // await this.presentLoading('Cargando datos de administrador...'); // Loading ya se presenta en ngOnInit
+    try {
+      this.animalesService.getTotalAnimales().subscribe(
+        (animales: any[]) => {
+          this.animalesGestionAdmin = animales.map((animal: any) => {
+            let domesticoValue = false;
+            if (typeof animal.isDomestico === 'boolean') {
+              domesticoValue = animal.isDomestico;
+            } else if (typeof animal.domestico === 'boolean') {
+              domesticoValue = animal.domestico;
+            }
+            return {
+              ...animal,
+              isDomestico: domesticoValue,
+              estado_conservacion: animal.estado_conservacion ? animal.estado_conservacion.replace(/_/g, ' ') : 'No especificado'
+            };
+          });
+          this.filteredAnimalesGestionAdmin = [...this.animalesGestionAdmin];
+        },
+        (err: any) => {
+          console.error('Error cargando todos los animales para admin:', err);
+          this.mostrarMensaje('Error cargando animales para admin.', 'danger');
+        }
+      );
+
+      this.adopcionesService.getTodasLasSolicitudes().subscribe(
+        (solicitudes: any[]) => {
+          this.solicitudesAdmin = solicitudes;
+        },
+        (err: any) => {
+          console.error('Error cargando todas las solicitudes para admin:', err);
+          this.mostrarMensaje('Error cargando solicitudes para admin.', 'danger');
+        }
+      );
+
+      this.empresasService.getTotalEmpresas().subscribe( // Cargar todas las empresas
+        (empresas: any[]) => {
+          this.todasLasEmpresas = empresas;
+        },
+        (err: any) => {
+          console.error('Error cargando todas las empresas para admin:', err);
+          this.mostrarMensaje('Error cargando empresas para admin.', 'danger');
+        }
+      );
+
+      // Quitar la condición que mostraba mensaje si ambas listas estaban vacías,
+      // ya que ahora hay una tercera carga (empresas)
+      // if (this.animalesGestionAdmin.length === 0 && this.solicitudesAdmin.length === 0) {
+      // }
+    } catch (err: any) {
+      console.error('Error cargando datos de admin:', err);
+      this.error = 'Error cargando datos de admin: ' + (err.message || 'Error desconocido');
+      if (this.error) this.mostrarMensaje(this.error, 'danger');
+    } finally {
+      await this.dismissLoading(); // Asegurarse que el loading se cierra después de todas las cargas
+    }
+  }
 
   cargarAnimalesDisponibles() {
-
     this.animalesService.getAnimalesDisponiblesAdopcion().subscribe(
       (animales: any[]) => {
         this.animalesDisponiblesUsuario = animales.map((animal: any) => ({
@@ -211,59 +280,23 @@ export class AdopcionesPage implements OnInit {
 
     this.selectedAnimal = animal;
 
-    const alert = await this.alertController.create({
-      header: 'Solicitar Adopción',
-      message: `Estás solicitando la adopción de ${animal.nombre_comun}. Por favor, añade tus comentarios.`,
-      inputs: [
-        {
-          name: 'comentarios',
-          type: 'textarea',
-          placeholder: 'Comentarios (mínimo 50 caracteres)',
-          attributes: {
-            rows: 5
-          }
-        }
-      ],
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-          cssClass: 'secondary'
-        },
-        {
-          text: 'Enviar Solicitud',
-          handler: async (data) => {
-            const comentarios = data.comentarios.trim();
-            if (!comentarios || comentarios.length < 50) {
-              this.mostrarMensaje('Los comentarios son requeridos y deben tener al menos 50 caracteres.', 'warning');
-              return false;
-            }
-
-            await this.presentLoading('Enviando solicitud...');
-            this.animalesService.solicitarAdopcion(
-              this.selectedAnimal.id,
-              this.userId!,
-              comentarios
-            ).subscribe(
-              async (response) => {
-                await this.dismissLoading();
-                this.mostrarMensaje('Solicitud de adopción enviada correctamente', 'success');
-                this.selectedAnimal = null;
-                this.cargarAnimalesDisponibles();
-              },
-              async (error) => {
-                await this.dismissLoading();
-                console.error('Error submitting adoption request:', error);
-                this.mostrarMensaje('Error al enviar la solicitud de adopción. Detalles: ' + (error.error?.message || error.message || 'Error desconocido'), 'danger');
-              }
-            );
-            return true;
-          }
-        }
-      ]
+    const modal = await this.modalController.create({
+      component: AdopcionModalComponent,
+      componentProps: {
+        animal: this.selectedAnimal,
+        userId: this.userId
+      },
+      cssClass: 'adopcion-modal-css'
     });
 
-    await alert.present();
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+    if (data && data.adopted) {
+      this.mostrarMensaje('Solicitud de adopción procesada.', 'success');
+      this.cargarAnimalesDisponibles();
+    }
+    this.selectedAnimal = null;
   }
 
   async cargarDatosEmpresa() {
@@ -275,7 +308,19 @@ export class AdopcionesPage implements OnInit {
       return;
     }
     try {
-      this.animalesGestionEmpresa = (await this.adopcionesService.getAnimalesEmpresa(this.empresaId).toPromise()) || [];
+      const animalesData = (await this.adopcionesService.getAnimalesEmpresa(this.empresaId).toPromise()) || [];
+      this.animalesGestionEmpresa = animalesData.map((animal: any) => {
+        let domesticoValue = false;
+        if (typeof animal.isDomestico === 'boolean') {
+          domesticoValue = animal.isDomestico;
+        } else if (typeof animal.domestico === 'boolean') {
+          domesticoValue = animal.domestico;
+        }
+        return {
+          ...animal,
+          isDomestico: domesticoValue
+        };
+      });
       this.solicitudes = (await this.adopcionesService.getSolicitudesEmpresa(this.empresaId).toPromise()) || [];
       if (this.animalesGestionEmpresa.length === 0 && this.solicitudes.length === 0) {
         this.mostrarMensaje('No hay animales ni solicitudes para gestionar.', 'tertiary');
@@ -293,15 +338,29 @@ export class AdopcionesPage implements OnInit {
     this.segmentModel = ev.detail.value;
   }
 
+  adminSegmentChanged(ev: any) {
+    this.adminSegmentModel = ev.detail.value;
+  }
+
   toggleListaAnimalesAdopcion() {
-    this.mostrarSoloEnAdopcion = !this.mostrarSoloEnAdopcion;
+  }
+
+  toggleListaAnimalesAdopcionAdmin() {
   }
 
   getAnimalesParaMostrarEmpresa() {
     if (this.mostrarSoloEnAdopcion) {
-      return this.animalesGestionEmpresa.filter(animal => animal.estadoAdopcion === 'DISPONIBLE' || animal.estadoAdopcion === 'EN_ADOPCION');
+      return this.animalesGestionEmpresa.filter(animal => animal.estadoAdopcion === 'DISPONIBLE');
     }
     return this.animalesGestionEmpresa;
+  }
+
+  getAnimalesParaMostrarAdmin() {
+    let animalesFiltrados = this.filteredAnimalesGestionAdmin;
+    if (this.mostrarSoloEnAdopcionAdmin) {
+      animalesFiltrados = animalesFiltrados.filter(animal => animal.estadoAdopcion === 'DISPONIBLE');
+    }
+    return animalesFiltrados;
   }
 
   async cambiarDomestico(animal: any, value: boolean) {
@@ -333,9 +392,20 @@ export class AdopcionesPage implements OnInit {
   async responderSolicitud(solicitud: any, nuevoEstado: 'APROBADA' | 'RECHAZADA') {
     await this.presentLoading('Respondiendo solicitud...');
     try {
-      await this.adopcionesService.responderSolicitudAdopcion(solicitud.id, nuevoEstado).toPromise();
-      this.mostrarMensaje(`Solicitud ${nuevoEstado.toLowerCase()} correctamente.`, 'success');
-      await this.cargarDatosEmpresa();
+      if (nuevoEstado === 'APROBADA') {
+        await this.adopcionesService.aprobarSolicitudAdopcion(solicitud.id).toPromise();
+      } else if (nuevoEstado === 'RECHAZADA') {
+        await this.adopcionesService.rechazarSolicitudAdopcion(solicitud.id).toPromise();
+      } else {
+        throw new Error('Estado no válido para responder solicitud.');
+      }
+      const actionText = nuevoEstado === 'APROBADA' ? 'aprobada' : 'rechazada';
+      this.mostrarMensaje(`Solicitud ${actionText} correctamente.`, 'success');
+      if (this.userRol === 'EMPRESA') {
+        await this.cargarDatosEmpresa();
+      } else if (this.userRol === 'ADMIN') {
+        await this.cargarDatosAdmin();
+      }
     } catch (err: any) {
       console.error('Error al responder solicitud:', err);
       this.mostrarMensaje('Error al responder la solicitud: ' + (err.message || 'Error desconocido'), 'danger');
@@ -344,27 +414,45 @@ export class AdopcionesPage implements OnInit {
     }
   }
 
-  async presentLoading(message: string) {
-    this.loading = true;
-    if (this.loadingElement && this.loadingElement.isConnected) {
-        this.loadingElement = null;
+  async cambiarEmpresaAnimal(animal: any, event: any) {
+    const empresaId = event.detail.value;
+    if (animal.empresa?.id === empresaId) {
+      return;
     }
-    if (!this.loadingElement) {
-        this.loadingElement = await this.loadingCtrl.create({
-            message,
-            spinner: 'circles',
-        });
-        await this.loadingElement.present();
-    } else {
-        this.loadingElement.message = message;
+    await this.presentLoading('Asignando empresa...');
+    try {
+      await this.animalesService.asignarEmpresa(animal.id, empresaId).toPromise();
+
+      const empresaSeleccionada = empresaId ? this.todasLasEmpresas.find(e => e.id === empresaId) : null;
+      animal.empresa = empresaSeleccionada;
+
+      this.mostrarMensaje('Empresa asignada/actualizada correctamente.', 'success');
+    } catch (err: any) {
+      console.error('Error asignando empresa al animal:', err);
+      this.mostrarMensaje('Error asignando empresa: ' + (err.message || 'Error desconocido'), 'danger');
+    } finally {
+      await this.dismissLoading();
     }
   }
 
-  async dismissLoading() {
+  async presentLoading(message: string) {
+    this.loading = true;
     if (this.loadingElement && this.loadingElement.isConnected) {
+        return;
+    }
+    this.loadingElement = await this.loadingCtrl.create({
+        message,
+        spinner: 'circles',
+    });
+    await this.loadingElement.present();
+  }
+
+  async dismissLoading() {
+    if (this.loadingElement && this.loadingElement.parentElement) {
         try {
-            await this.loadingCtrl.dismiss();
+            await this.loadingElement.dismiss();
         } catch (e) {
+            console.warn('Dismiss loading error:', e);
         }
     }
     this.loadingElement = null;

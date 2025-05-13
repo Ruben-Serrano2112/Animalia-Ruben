@@ -16,4 +16,7 @@ public interface AdopcionRepositorio extends JpaRepository<Adopcion, Long> {
     List<Adopcion> findByEstadoAndDeletedFalse(Adopcion.EstadoSolicitud estado);
     @Query("SELECT a FROM Adopcion a WHERE a.animal.empresa.id = :empresaId AND a.deleted = false")
     List<Adopcion> findByEmpresaIdAndDeletedFalse(@Param("empresaId") Long empresaId);
+
+    @Query("SELECT a FROM Adopcion a WHERE a.deleted = false")
+    List<Adopcion> findAllNotDeleted();
 }

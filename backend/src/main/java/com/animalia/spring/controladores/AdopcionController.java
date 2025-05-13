@@ -17,45 +17,80 @@ public class AdopcionController {
     @Autowired
     private AdopcionServicio adopcionServicio;
 
-    // Implementar métodos para:
-    // - Solicitar una adopción
-    // - Aprobar/rechazar solicitudes
-    // - Listar adopciones por usuario
-    // - Listar adopciones por animal
-    // - Obtener estado de una solicitud
-
     @PostMapping("/solicitar")
     public ResponseEntity<?> solicitarAdopcion(@RequestBody Map<String, Object> body) {
         try {
-            System.out.println("Received request body: " + body);
             
             Long usuarioId = Long.valueOf(body.get("usuario_id").toString());
             Long animalId = Long.valueOf(body.get("animal_id").toString());
             String comentarios = body.get("comentarios") != null ? body.get("comentarios").toString() : "";
-            String estado = body.get("estado") != null ? body.get("estado").toString() : "PENDIENTE";
-            boolean deleted = body.get("deleted") != null ? Boolean.valueOf(body.get("deleted").toString()) : false;
-            
-            System.out.println("Processed data: " + 
-                "usuarioId=" + usuarioId + 
-                ", animalId=" + animalId + 
-                ", comentarios=" + comentarios + 
-                ", estado=" + estado + 
-                ", deleted=" + deleted);
             
             Adopcion adopcion = adopcionServicio.solicitarAdopcion(usuarioId, animalId, comentarios);
             return ResponseEntity.ok(adopcion);
         } catch (RuntimeException e) {
-            System.err.println("Error processing request: " + e.getMessage());
+            System.err.println("Error processing /solicitar request: " + e.getMessage());
+            e.printStackTrace(); 
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            System.err.println("Unexpected error: " + e.getMessage());
+            System.err.println("Unexpected error in /solicitar: " + e.getMessage());
+            e.printStackTrace(); 
             return ResponseEntity.internalServerError().body("Error al procesar la solicitud de adopción");
         }
     }
 
     @GetMapping("/empresa/{empresaId}")
-    public ResponseEntity<List<Adopcion>> obtenerSolicitudesPorEmpresa(@PathVariable Long empresaId) {
-        List<Adopcion> solicitudes = adopcionServicio.obtenerSolicitudesPorEmpresa(empresaId);
-        return ResponseEntity.ok(solicitudes);
+    public ResponseEntity<?> obtenerSolicitudesPorEmpresa(@PathVariable Long empresaId) { // Changed return type to ResponseEntity<?>
+        try {
+            List<Adopcion> solicitudes = adopcionServicio.obtenerSolicitudesPorEmpresa(empresaId);
+            return ResponseEntity.ok(solicitudes);
+        } catch (Exception e) {
+            System.err.println("Error fetching solicitudes for empresa " + empresaId + ": " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Error al obtener solicitudes de la empresa."); // This is now valid
+        }
     }
-} 
+
+    @PutMapping("/{solicitudId}/aprobar")
+    public ResponseEntity<?> aprobarSolicitud(@PathVariable Long solicitudId) {
+        try {
+            Adopcion adopcionActualizada = adopcionServicio.actualizarEstadoAdopcion(solicitudId, Adopcion.EstadoSolicitud.APROBADA);
+            return ResponseEntity.ok(adopcionActualizada);
+        } catch (RuntimeException e) {
+            System.err.println("Error al aprobar solicitud " + solicitudId + ": " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Error inesperado al aprobar solicitud " + solicitudId + ": " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Error inesperado al procesar la aprobación de la solicitud.");
+        }
+    }
+
+    @PutMapping("/{solicitudId}/rechazar")
+    public ResponseEntity<?> rechazarSolicitud(@PathVariable Long solicitudId) {
+        try {
+            Adopcion adopcionActualizada = adopcionServicio.actualizarEstadoAdopcion(solicitudId, Adopcion.EstadoSolicitud.RECHAZADA);
+            return ResponseEntity.ok(adopcionActualizada);
+        } catch (RuntimeException e) {
+            System.err.println("Error al rechazar solicitud " + solicitudId + ": " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Error inesperado al rechazar solicitud " + solicitudId + ": " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Error inesperado al procesar el rechazo de la solicitud.");
+        }
+    }
+
+    @GetMapping("/todas")
+    public ResponseEntity<?> obtenerTodasLasSolicitudes() {
+        try {
+            List<Adopcion> solicitudes = adopcionServicio.obtenerTodasLasSolicitudes();
+            return ResponseEntity.ok(solicitudes);
+        } catch (Exception e) {
+            System.err.println("Error al obtener todas las solicitudes: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Error al obtener todas las solicitudes.");
+        }
+    }
+}

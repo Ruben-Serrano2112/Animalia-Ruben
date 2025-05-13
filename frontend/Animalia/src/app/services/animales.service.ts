@@ -34,7 +34,6 @@ export class AnimalesService {
     animalId: number,
     usuarioId: number,
     comentarios: string,
-    // aceptaTerminos is usually client-side, but can be passed if needed by backend
   ): Observable<any> {
     console.log('AnimalesService - solicitarAdopcion - Input:', {
       animalId,
@@ -55,5 +54,13 @@ export class AnimalesService {
     console.log('AnimalesService - solicitarAdopcion - URL:', url);
 
     return this.http.post<any>(url, adopcionData);
+  }
+
+  asignarEmpresa(animalId: number, empresaId: number | null): Observable<any> {
+    // El backend debe estar preparado para recibir null como empresaId para desasignar.
+    // La URL podría ser algo como /animales/{animalId}/asignar-empresa
+    // o un PUT general a /animales/{animalId} con el nuevo empresaId en el body.
+    // Por simplicidad, usaré un PUT específico.
+    return this.http.put<any>(`${this.apiUrl}/animales/${animalId}/asignar-empresa`, { empresaId });
   }
 }

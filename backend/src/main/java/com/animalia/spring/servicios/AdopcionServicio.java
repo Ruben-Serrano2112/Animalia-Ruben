@@ -54,14 +54,20 @@ public class AdopcionServicio {
         Adopcion adopcion = adopcionRepositorio.findById(adopcionId)
                 .orElseThrow(() -> new RuntimeException("Adopción no encontrada"));
 
+        Animales animal = animalesRepositorio.findById(adopcion.getAnimal().getId())
+                    .orElseThrow(() -> new RuntimeException("Animal no encontrado con ID: " + adopcion.getAnimal().getId()));
+
         adopcion.setEstado(nuevoEstado);
+
         if (nuevoEstado == Adopcion.EstadoSolicitud.APROBADA) {
             adopcion.setFechaAprobacion(LocalDateTime.now());
-            Animales animal = animalesRepositorio.findById(adopcion.getAnimal().getId())
-                    .orElseThrow(() -> new RuntimeException("Animal no encontrado"));
             animal.setEstadoAdopcion(Animales.EstadoAdopcion.ADOPTADO);
             animalesRepositorio.save(animal);
+        } else if (nuevoEstado == Adopcion.EstadoSolicitud.RECHAZADA) {
+            animal.setEstadoAdopcion(Animales.EstadoAdopcion.DISPONIBLE);
+            animalesRepositorio.save(animal);
         }
+
 
         return adopcionRepositorio.save(adopcion);
     }
@@ -87,5 +93,9 @@ public class AdopcionServicio {
 
     public List<Adopcion> obtenerSolicitudesPorEmpresa(Long empresaId) {
         return adopcionRepositorio.findByEmpresaIdAndDeletedFalse(empresaId);
+    }
+
+    public List<Adopcion> obtenerTodasLasSolicitudes() {
+        return adopcionRepositorio.findAllNotDeleted();
     }
 }

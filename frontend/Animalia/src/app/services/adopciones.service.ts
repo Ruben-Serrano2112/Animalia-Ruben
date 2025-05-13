@@ -26,7 +26,15 @@ export class AdopcionesService {
     return this.http.get<any[]>(`${this.apiUrl}/adopciones/empresa/${empresaId}`);
   }
 
-  responderSolicitudAdopcion(solicitudId: number, respuesta: string): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/adopciones/${solicitudId}/responder`, { estado: respuesta });
+  aprobarSolicitudAdopcion(solicitudId: number): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/adopciones/${solicitudId}/aprobar`, {});
+  }
+
+  rechazarSolicitudAdopcion(solicitudId: number): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/adopciones/${solicitudId}/rechazar`, {});
+  }
+
+  getTodasLasSolicitudes(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/adopciones/todas`);
   }
 }
