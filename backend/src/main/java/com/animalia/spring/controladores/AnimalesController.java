@@ -122,7 +122,7 @@ public class AnimalesController {
         Animales actualizado = animalesServicio.actualizarDomesticoYEstado(animalId, isDomestico, estadoAdopcion);
         return ResponseEntity.ok(actualizado);
     }
-     @PutMapping("/{id_animal}/asignar-empresa") // CAMBIADO: de "asignarEmpresa" a "asignar-empresa"
+     @PutMapping("/{id_animal}/asignar-empresa")
     @Operation(summary = "Asignar una empresa a un animal", description = "Asigna una empresa existente a un animal existente en el sistema")
     public ResponseEntity<Animales> asignarEmpresaAAnimal(
             @PathVariable Long id_animal,

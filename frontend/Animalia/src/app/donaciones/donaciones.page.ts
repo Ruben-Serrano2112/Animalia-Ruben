@@ -254,11 +254,23 @@ export class DonacionesPage implements OnInit {
     if (this.isEmpresa) this.showDonations = true;
   }
 
-  verMisDonaciones() {
+  async verMisDonaciones() {
     const usuarioId = sessionStorage.getItem('id');
     if (usuarioId) {
-      this.donacionesService.obtenerDonacionesPorUsuario(Number(usuarioId)).subscribe(donaciones => {
-        this.donacionesUsuario = donaciones;
+      this.donacionesService.obtenerDonacionesPorUsuario(Number(usuarioId)).subscribe(async donaciones => {
+        this.donacionesUsuario = await Promise.all(donaciones.map(async (donacion: any) => {
+          let nombreEmpresa = '';
+          if (donacion.empresaId) {
+            try {
+              const empresa = await this.empresasService.getById(donacion.empresaId).toPromise();
+              nombreEmpresa = empresa?.nombre || ('empresa #' + donacion.empresaId) ;
+            } catch (error) {
+              console.error('Error fetching empresa details for donacion:', donacion.id, error);
+              nombreEmpresa = 'empresa #' + donacion.empresaId;
+            }
+          }
+          return { ...donacion, nombreEmpresa };
+        }));
         this.showUserDonations = true;
       });
     }
