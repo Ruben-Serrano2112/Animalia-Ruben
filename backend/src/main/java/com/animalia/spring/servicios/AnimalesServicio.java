@@ -8,13 +8,18 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.animalia.spring.entidades.Animales;
+import com.animalia.spring.entidades.Empresas;
 import com.animalia.spring.repositorio.AnimalesRepositorio;
+import com.animalia.spring.repositorio.EmpresasRepositorio;
 
 @Service
 public class AnimalesServicio {
 
     @Autowired
     private AnimalesRepositorio animalesRepositorio;
+
+    @Autowired
+    private EmpresasRepositorio empresaRepository;
 
     public List<Animales> obtenerAnimales() {
         return animalesRepositorio.findAllActive();
@@ -69,6 +74,18 @@ public class AnimalesServicio {
         Animales animal = animalesRepositorio.findById(animalId).orElseThrow(() -> new RuntimeException("Animal no encontrado"));
         animal.setDomestico(isDomestico);
         animal.setEstadoAdopcion(estadoAdopcion);
+        return animalesRepositorio.save(animal);
+    }
+
+    public Animales asignarEmpresaAAnimal(Long id_animal, Long id_empresa) {
+
+        Animales animal = obtenerAnimalPorId(id_animal);
+        if (animal == null) {
+            throw new com.animalia.spring.Excepciones.AnimalNoEcontrada();
+        }
+            Empresas empresa = empresaRepository.findById(id_empresa)
+            .orElseThrow(() -> new RuntimeException("Empresa no encontrada"));
+        animal.setEmpresa(empresa);
         return animalesRepositorio.save(animal);
     }
 }

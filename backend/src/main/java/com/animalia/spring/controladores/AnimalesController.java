@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -120,5 +121,23 @@ public class AnimalesController {
         Animales.EstadoAdopcion estadoAdopcion = Animales.EstadoAdopcion.valueOf(estadoAdopcionStr);
         Animales actualizado = animalesServicio.actualizarDomesticoYEstado(animalId, isDomestico, estadoAdopcion);
         return ResponseEntity.ok(actualizado);
+    }
+     @PutMapping("/{id_animal}/asignar-empresa") // CAMBIADO: de "asignarEmpresa" a "asignar-empresa"
+    @Operation(summary = "Asignar una empresa a un animal", description = "Asigna una empresa existente a un animal existente en el sistema")
+    public ResponseEntity<Animales> asignarEmpresaAAnimal(
+            @PathVariable Long id_animal,
+            @RequestBody Map<String, Long> payload) {
+        Long id_empresa = payload.get("empresaId"); 
+        if (id_empresa == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        try {
+            Animales animalActualizado = animalesServicio.asignarEmpresaAAnimal(id_animal, id_empresa);
+            return ResponseEntity.ok(animalActualizado);
+        } catch (AnimalNoEcontrada e) { 
+            return ResponseEntity.notFound().build();
+        } catch (RuntimeException e) { 
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

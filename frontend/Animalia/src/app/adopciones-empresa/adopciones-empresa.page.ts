@@ -145,24 +145,19 @@ export class AdopcionesEmpresaPage implements OnInit {
     }
   }
 
-  async responderSolicitud(solicitud: any, nuevoEstado: string) { // Asegúrate que este método exista si es necesario
+  async responderSolicitud(solicitud: any, nuevoEstado: string) {
     try {
-      // TEMPORALMENTE COMENTADO - ASEGÚRATE DE QUE ESTE MÉTODO EXISTA EN TU SERVICIO
-      // await this.adopcionesService.responderSolicitudAdopcion(solicitud.id, nuevoEstado).toPromise();
       console.log(`Simulando respuesta a solicitud ${solicitud.id} con estado ${nuevoEstado}`);
-      // Simulación de la actualización para la UI
       solicitud.estado = nuevoEstado;
 
       if (nuevoEstado === 'APROBADA') {
         const animal = this.animales.find(a => a.id === solicitud.animal.id);
         if (animal) {
-          // await this.cambiarEstadoAdopcion(animal, 'EN_PROCESO'); // O 'ADOPTADO' según la lógica de negocio
           console.log(`Simulando cambio de estado de animal ${animal.id} a EN_PROCESO`);
-          animal.estadoAdopcion = 'EN_PROCESO'; // Simulación para la UI
+          animal.estadoAdopcion = 'EN_PROCESO';
         }
       }
       this.mostrarToast(`Solicitud ${nuevoEstado.toLowerCase()} (simulado) correctamente`, 'success');
-      // await this.cargarDatos(); // Considera si es necesario recargar todo o actualizar localmente
     } catch (err: any) {
       this.mostrarToast('Error al responder la solicitud (simulado): ' + (err.message || 'Error desconocido'), 'danger');
     }

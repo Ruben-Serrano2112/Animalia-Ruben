@@ -8,13 +8,11 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <!-- Loading Indicator -->
   <div *ngIf="loading" class="ion-text-center ion-padding-vertical">
     <ion-spinner name="circles" color="primary"></ion-spinner>
     <p>Cargando...</p>
   </div>
 
-  <!-- Error Message -->
   <ion-card *ngIf="error && !loading" color="light" class="ion-margin-bottom">
     <ion-card-content color="danger" class="ion-padding d-flex align-items-center">
       <ion-icon name="alert-circle-outline" slot="start" class="ion-margin-end"></ion-icon>
@@ -22,7 +20,6 @@
     </ion-card-content>
   </ion-card>
 
-  <!-- Segmentos para ADMIN arriba de todo el contenido de ADMIN -->
   <ng-container *ngIf="!loading && !error && userRol === 'ADMIN'">
     <ion-segment [(ngModel)]="adminSegmentModel" (ionChange)="adminSegmentChanged($event)" color="tertiary" class="ion-margin-top ion-margin-bottom">
       <ion-segment-button value="solicitar">
@@ -40,7 +37,6 @@
     </ion-segment>
   </ng-container>
 
-  <!-- View for Standard Users (USER) or ADMIN's "Solicitar Adopción" tab -->
   <ng-container *ngIf="!loading && !error && (userRol !== 'EMPRESA' && userRol !== 'ADMIN' || (userRol === 'ADMIN' && adminSegmentModel === 'solicitar'))">
     <ion-card class="proceso-card ion-margin-bottom">
       <ion-card-header>
@@ -156,7 +152,6 @@
     </ion-footer>
   </ng-container>
 
-  <!-- View for Company Users (EMPRESA) -->
   <ng-container *ngIf="!loading && !error && userRol === 'EMPRESA'">
     <ion-segment [(ngModel)]="segmentModel" (ionChange)="segmentChanged($event)" color="secondary" class="ion-margin-top ion-margin-bottom">
       <ion-segment-button value="animales">
@@ -247,7 +242,6 @@
     </div>
   </ng-container>
 
-  <!-- Vistas específicas para ADMIN (Gestionar Animales y Gestionar Solicitudes) -->
   <ng-container *ngIf="!loading && !error && userRol === 'ADMIN'">
     <!-- Admin: Gestionar Animales Global -->
     <div *ngIf="adminSegmentModel === 'gestionarAnimales'">
@@ -298,7 +292,6 @@
       </ion-list>
     </div>
 
-    <!-- Admin: Gestionar Solicitudes Global -->
     <div *ngIf="adminSegmentModel === 'gestionarSolicitudes'">
       <div *ngIf="solicitudesAdmin.length === 0 && !loading" class="ion-padding ion-text-center">
           <ion-icon name="file-tray-full-outline" size="large" color="medium"></ion-icon>

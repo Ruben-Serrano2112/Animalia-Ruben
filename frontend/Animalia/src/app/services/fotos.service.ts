@@ -14,7 +14,6 @@ private apiUrl = `${environment.apiUrl}`;
   getFotos(page: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/fotos?page=${page}`);
   }
-  // Obtener todos los animales para calcular el total de páginas
   getTotalFotos() {
     return this.http.get<any>(`${this.apiUrl}/fotos/todos`);
   }
@@ -39,7 +38,7 @@ private apiUrl = `${environment.apiUrl}`;
       url_foto: url_foto,
       descripcion: descripcion,
       ubicacion: ubicacion,
-      fecha_captura: new Date().toISOString().split('T')[0] // Fecha actual
+      fecha_captura: new Date().toISOString().split('T')[0]
     };
     console.log(body);
 

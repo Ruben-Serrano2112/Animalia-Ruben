@@ -2,7 +2,6 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ModalController, ToastController, NavParams } from '@ionic/angular';
 import { AnimalesService } from '../../services/animales.service';
-// import { UsuarioService } from '../../services/usuario.service'; // UsuarioService may not be needed if userId is passed directly
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
@@ -24,18 +23,17 @@ export class AdopcionModalComponent implements OnInit {
     private modalController: ModalController,
     private fb: FormBuilder,
     private animalesService: AnimalesService,
-    // private usuarioService: UsuarioService, // UsuarioService may not be needed if userId is passed directly
     private toastController: ToastController,
-    private navParams: NavParams // Para recibir datos en el modal
+    private navParams: NavParams
   ) {
     this.adoptionForm = this.fb.group({
       comentarios: ['', Validators.required],
       aceptaTerminos: [false, Validators.requiredTrue]
     });
     this.animal = this.navParams.get('animal');
-    this.userId = this.navParams.get('userId'); // Get userId from navParams
+    this.userId = this.navParams.get('userId');
 
-    // Log received parameters for debugging
+
     console.log('AdopcionModalComponent - Constructor - NavParams:', {
       animal: this.animal,
       userId: this.userId
@@ -43,18 +41,15 @@ export class AdopcionModalComponent implements OnInit {
 
     if (!this.userId) {
       console.error('Usuario ID no recibido a través de NavParams. El modal de adopción no puede funcionar correctamente.');
-      // Optionally, show a message and dismiss, or handle as an error state
       this.mostrarMensaje('Error: No se pudo obtener el ID del usuario para el modal.', 'danger');
-      this.dismiss(); // Dismiss if critical info is missing
+      this.dismiss();
     }
   }
 
   ngOnInit() {
-    // If @Input userId is preferred, ensure it's prioritized or merged with navParams
-    // For now, constructor handles navParams. Logging to see if @Input is also set.
     console.log('AdopcionModalComponent - ngOnInit - @Input values:', {
-      animal: this.animal, // this.animal is also set from navParams in constructor
-      userId: this.userId  // this.userId is also set from navParams in constructor
+      animal: this.animal,
+      userId: this.userId
     });
     if (!this.animal) {
         this.animal = this.navParams.get('animal');
