@@ -255,10 +255,14 @@ export class DonacionesPage implements OnInit {
   }
 
   async verMisDonaciones() {
-    const usuarioId = sessionStorage.getItem('id');
-    if (usuarioId) {
-      this.donacionesService.obtenerDonacionesPorUsuario(Number(usuarioId)).subscribe(async donaciones => {
-        this.donacionesUsuario = await Promise.all(donaciones.map(async (donacion: any) => {
+    const currentUsuarioIdString = sessionStorage.getItem('id');
+    if (currentUsuarioIdString) {
+      const currentUsuarioId = Number(currentUsuarioIdString);
+      this.donacionesService.obtenerDonacionesPorUsuario(currentUsuarioId).subscribe(async (allFetchedDonations: any[]) => {
+
+        const userSpecificDonations = allFetchedDonations.filter(donacion => donacion.usuarioId === currentUsuarioId);
+
+        this.donacionesUsuario = await Promise.all(userSpecificDonations.map(async (donacion: any) => {
           let nombreEmpresa = '';
           if (donacion.empresaId) {
             try {
@@ -281,7 +285,7 @@ export class DonacionesPage implements OnInit {
   }
 
   cargarTodasLasDonaciones() {
-    this.donacionesService.obtenerTodasLasDonaciones().subscribe(async (donaciones) => {
+    this.donacionesService.obtenerTodasLasDonaciones().subscribe(async (donaciones: any[]) => {
       this.donacionesAdmin = await Promise.all(donaciones.map(async (donacion: any) => {
         let usuarioNombre = '';
         let empresaNombre = '';
