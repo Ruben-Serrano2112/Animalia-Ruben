@@ -6,7 +6,7 @@ public class RescateUbicacionEstadoDTO {
     private String ubicacion;
     private EstadoAnimal estadoAnimal;
 
-
+    // Getters y setters
     public String getUbicacion() {
         return ubicacion;
     }

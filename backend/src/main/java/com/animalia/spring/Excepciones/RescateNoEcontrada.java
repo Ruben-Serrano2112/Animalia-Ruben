@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class RescateNoEcontrada extends RuntimeException {
 
+    // Identificador de la clase
     private static final long serialVersionUID = 1L;
 
     public RescateNoEcontrada(Long id) {

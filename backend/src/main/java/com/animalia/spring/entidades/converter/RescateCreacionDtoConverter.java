@@ -27,6 +27,7 @@ public class RescateCreacionDtoConverter {
         Usuarios usuario = usuarioServicio.obtenerUsuarioPorId(dto.getUsuarioId());
         rescate.setAnimal(animal);
         rescate.setUsuario(usuario);
+        // Set other fields as needed
         return rescate;
     }
 }

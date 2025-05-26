@@ -250,34 +250,22 @@ export class DonacionesPage implements OnInit {
 
   cerrarFormularioDonacion() {
     this.showFormModal = false;
-    if (this.isAdmin) this.showAdminDonaciones = true;
-    if (this.isEmpresa) this.showDonaciones = true;
+    if (this.isAdmin) this.showAdminDonations = true;
+    if (this.isEmpresa) this.showDonations = true;
   }
 
   verMisDonaciones() {
     const usuarioId = sessionStorage.getItem('id');
     if (usuarioId) {
-      this.donacionesService.obtenerDonacionesPorUsuario(Number(usuarioId)).subscribe(async donaciones => {
-        this.donacionesUsuario = await Promise.all(donaciones.map(async (donacion: any) => {
-          let nombreEmpresa = '';
-          if (donacion.empresaId) {
-            try {
-              const empresa = await this.empresasService.getById(donacion.empresaId).toPromise();
-              nombreEmpresa = empresa?.nombre || ('empresa #' + donacion.empresaId) ;
-            } catch (error) {
-              console.error('Error fetching empresa details for donacion:', donacion.id, error);
-              nombreEmpresa = 'empresa #' + donacion.empresaId;
-            }
-          }
-          return { ...donacion, nombreEmpresa };
-        }));
+      this.donacionesService.obtenerDonacionesPorUsuario(Number(usuarioId)).subscribe(donaciones => {
+        this.donacionesUsuario = donaciones;
         this.showUserDonations = true;
       });
     }
   }
 
   volverAlFormulario() {
-    this.showUserDonaciones = false;
+    this.showUserDonations = false;
   }
 
   cargarTodasLasDonaciones() {
@@ -303,7 +291,7 @@ export class DonacionesPage implements OnInit {
         }
         return { ...donacion, usuarioNombre, empresaNombre };
       }));
-      this.showAdminDonaciones = true;
+      this.showAdminDonations = true;
     });
   }
 }

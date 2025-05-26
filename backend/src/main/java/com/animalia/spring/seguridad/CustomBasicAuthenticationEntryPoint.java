@@ -22,6 +22,7 @@ public class CustomBasicAuthenticationEntryPoint extends BasicAuthenticationEntr
 
 	private final ObjectMapper mapper;
 
+	//Este método es para enviar un mensaje al cliente cuando hay un error en la autenticación básica
 	@Override
 	public void commence(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException authException) throws IOException {
@@ -30,6 +31,7 @@ public class CustomBasicAuthenticationEntryPoint extends BasicAuthenticationEntr
 		response.setStatus(HttpStatus.UNAUTHORIZED.value());
 		
 		ApiError apiError = new ApiError(HttpStatus.UNAUTHORIZED, authException.getMessage());
+		// Tranforma la apiError a un String (en formato JSON)
 		String strApiError = mapper.writeValueAsString(apiError);
 		
 		PrintWriter writer = response.getWriter();

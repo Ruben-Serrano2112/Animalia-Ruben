@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { AnimalesService } from '../services/animales.service';
 import { Router } from '@angular/router';
-import { ToastController, ModalController } from '@ionic/angular';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ToastController, ModalController, LoadingController } from '@ionic/angular';
+import { UsuarioService } from '../services/usuario.service';
+import { AdopcionesService } from '../services/adopciones.service';
 import { AdopcionModalComponent } from './adopcion-modal/adopcion-modal.component';
 import { EmpresasService } from '../services/empresas.service'; // Importar EmpresasService
 
@@ -32,19 +33,30 @@ export class AdopcionesPage implements OnInit {
 
   userId: number | null = null;
   selectedFamilia: string | null = null;
-  adoptionForm: FormGroup;
-  showAdoptionForm: boolean = false;
   selectedAnimal: any = null;
 
-  totalAnimales: number = 0;
-  totalPages: number = 0;
-  currentPage: number = 0;
-  currentPagehtml: number = 1;
   itemsPerPage: number = 5;
-  paginaActual: any[] = [];
+
+  userRol: string | null = null;
+  empresaId: number = 0;
+  solicitudes: any[] = [];
+  public loading: boolean = false;
+  private loadingElement: HTMLIonLoadingElement | null = null;
+  segmentModel = 'animales';
+  adminSegmentModel = 'solicitar';
+  mostrarSoloEnAdopcion = false;
+  error: string | null = null;
+
+  handleImageError(event: Event, defaultSrc: string) {
+    const target = event.target as HTMLImageElement;
+    if (target) {
+      target.src = defaultSrc;
+    }
+  }
 
   constructor(
     private animalesService: AnimalesService,
+    private adopcionesService: AdopcionesService,
     private router: Router,
     private toastController: ToastController,
     private modalController: ModalController,
@@ -157,19 +169,23 @@ export class AdopcionesPage implements OnInit {
   cargarAnimalesDisponibles() {
     this.animalesService.getAnimalesDisponiblesAdopcion().subscribe(
       (animales: any[]) => {
-        this.animales = animales.map((animal: any) => ({
+        this.animalesDisponiblesUsuario = animales.map((animal: any) => ({
           ...animal,
-          estado_conservacion: animal.estado_conservacion.replace(/_/g, ' ')
+          estado_conservacion: animal.estado_conservacion ? animal.estado_conservacion.replace(/_/g, ' ') : 'No especificado'
         }));
-        this.filteredAnimals = [...this.animales];
-        this.totalAnimales = this.filteredAnimals.length;
-        this.totalPages = Math.ceil(this.totalAnimales / this.itemsPerPage);
-        this.currentPage = 0;
-        this.currentPagehtml = 1;
+        this.filteredAnimalesUsuario = [...this.animalesDisponiblesUsuario];
+        this.totalAnimalesUsuario = this.filteredAnimalesUsuario.length;
+        this.totalPagesUsuario = Math.ceil(this.totalAnimalesUsuario / this.itemsPerPage);
+        this.currentPageUsuario = 0;
+        this.currentPagehtmlUsuario = 1;
         this.actualizarPagina();
+        this.dismissLoading();
       },
       (error) => {
         console.error('Error al cargar animales:', error);
+        this.error = 'Error al cargar animales disponibles.';
+        if (this.error) this.mostrarMensaje(this.error, 'danger');
+        this.dismissLoading();
       }
     );
   }
@@ -179,23 +195,23 @@ export class AdopcionesPage implements OnInit {
   }
 
   actualizarPagina() {
-    const start = this.currentPage * this.itemsPerPage;
+    const start = this.currentPageUsuario * this.itemsPerPage;
     const end = start + this.itemsPerPage;
-    this.paginaActual = this.filteredAnimals.slice(start, end);
+    this.paginaActualUsuario = this.filteredAnimalesUsuario.slice(start, end);
   }
 
   nextPage() {
-    if (this.currentPage < this.totalPages - 1) {
-      this.currentPage++;
-      this.currentPagehtml++;
+    if (this.currentPageUsuario < this.totalPagesUsuario - 1) {
+      this.currentPageUsuario++;
+      this.currentPagehtmlUsuario++;
       this.actualizarPagina();
     }
   }
 
   prevPage() {
-    if (this.currentPage > 0) {
-      this.currentPage--;
-      this.currentPagehtml--;
+    if (this.currentPageUsuario > 0) {
+      this.currentPageUsuario--;
+      this.currentPagehtmlUsuario--;
       this.actualizarPagina();
     }
   }
@@ -207,30 +223,33 @@ export class AdopcionesPage implements OnInit {
   }
 
   searchAnimals(query: string) {
-    this.currentPage = 0;
+    this.currentPageUsuario = 0;
+    this.currentPagehtmlUsuario = 1;
     if (query === '') {
-      this.filteredAnimals = [...this.animales];
+      this.filteredAnimalesUsuario = [...this.animalesDisponiblesUsuario];
     } else {
-      this.filteredAnimals = this.animales.filter((d: any) =>
+      this.filteredAnimalesUsuario = this.animalesDisponiblesUsuario.filter((d: any) =>
         d.nombre_comun.toLowerCase().includes(query)
       );
     }
+    this.totalAnimalesUsuario = this.filteredAnimalesUsuario.length;
+    this.totalPagesUsuario = Math.ceil(this.totalAnimalesUsuario / this.itemsPerPage);
     this.actualizarPagina();
   }
 
   cambioFamilia(familia: string | null) {
     if (this.selectedFamilia === familia) {
       this.selectedFamilia = null;
-      this.filteredAnimals = [...this.animales];
+      this.filteredAnimalesUsuario = [...this.animalesDisponiblesUsuario];
     } else {
       this.selectedFamilia = familia;
-      this.filteredAnimals = this.animales.filter((animal: any) => animal.familia === familia);
+      this.filteredAnimalesUsuario = this.animalesDisponiblesUsuario.filter((animal: any) => animal.familia === familia);
     }
 
-    this.totalAnimales = this.filteredAnimals.length;
-    this.totalPages = Math.ceil(this.totalAnimales / this.itemsPerPage);
-    this.currentPage = 0;
-    this.currentPagehtml = 1;
+    this.totalAnimalesUsuario = this.filteredAnimalesUsuario.length;
+    this.totalPagesUsuario = Math.ceil(this.totalAnimalesUsuario / this.itemsPerPage);
+    this.currentPageUsuario = 0;
+    this.currentPagehtmlUsuario = 1;
     this.actualizarPagina();
   }
 
@@ -259,55 +278,189 @@ export class AdopcionesPage implements OnInit {
       return;
     }
 
-    console.log('AdopcionesPage - iniciarAdopcion - Opening modal with data:', {
-      animal: animal,
-      userId: this.userId
-    });
+    this.selectedAnimal = animal;
 
     const modal = await this.modalController.create({
       component: AdopcionModalComponent,
       componentProps: {
-        animal: animal,
+        animal: this.selectedAnimal,
         userId: this.userId
       },
-      cssClass: 'adoption-modal'
+      cssClass: 'adopcion-modal-css'
     });
 
     await modal.present();
 
-    const { data } = await modal.onWillDismiss();
-    console.log('AdopcionesPage - iniciarAdopcion - Modal dismissed with data:', data);
-
-    if (data?.adopted) {
-      console.log('AdopcionesPage - iniciarAdopcion - Reloading animals list');
+    const { data } = await modal.onDidDismiss();
+    if (data && data.adopted) {
+      this.mostrarMensaje('Solicitud de adopción procesada.', 'success');
       this.cargarAnimalesDisponibles();
     }
-  }
-
-  async submitAdoptionForm() {
-    if (this.adoptionForm.valid && this.selectedAnimal && this.userId) {
-      const comentarios = this.adoptionForm.get('comentarios')?.value;
-
-      this.animalesService.solicitarAdopcion(this.selectedAnimal.id, this.userId, comentarios).subscribe(
-        async (response) => {
-          this.mostrarMensaje('Solicitud de adopción enviada correctamente', 'success');
-          this.adoptionForm.reset();
-          this.selectedAnimal = null;
-          this.cargarAnimalesDisponibles();
-        },
-        async (error) => {
-          this.mostrarMensaje('Error al enviar la solicitud de adopción', 'danger');
-        }
-      );
-    }
-  }
-
-  cancelarAdopcion() {
-    this.adoptionForm.reset();
     this.selectedAnimal = null;
   }
 
+  async cargarDatosEmpresa() {
+    this.error = null;
+    if (!this.empresaId) {
+      this.error = 'ID de empresa no disponible. No se pueden cargar los datos.';
+      if (this.error) this.mostrarMensaje(this.error, 'warning');
+      await this.dismissLoading();
+      return;
+    }
+    try {
+      const animalesData = (await this.adopcionesService.getAnimalesEmpresa(this.empresaId).toPromise()) || [];
+      this.animalesGestionEmpresa = animalesData.map((animal: any) => {
+        let domesticoValue = false;
+        if (typeof animal.isDomestico === 'boolean') {
+          domesticoValue = animal.isDomestico;
+        } else if (typeof animal.domestico === 'boolean') {
+          domesticoValue = animal.domestico;
+        }
+        return {
+          ...animal,
+          isDomestico: domesticoValue
+        };
+      });
+      this.solicitudes = (await this.adopcionesService.getSolicitudesEmpresa(this.empresaId).toPromise()) || [];
+      if (this.animalesGestionEmpresa.length === 0 && this.solicitudes.length === 0) {
+        this.mostrarMensaje('No hay animales ni solicitudes para gestionar.', 'tertiary');
+      }
+    } catch (err: any) {
+      console.error('Error cargando datos específicos de la empresa:', err);
+      this.error = 'Error cargando animales/solicitudes: ' + (err.message || 'Error desconocido');
+      if (this.error) this.mostrarMensaje(this.error, 'danger');
+    } finally {
+      await this.dismissLoading();
+    }
+  }
+
+  segmentChanged(ev: any) {
+    this.segmentModel = ev.detail.value;
+  }
+
+  adminSegmentChanged(ev: any) {
+    this.adminSegmentModel = ev.detail.value;
+  }
+
+  toggleListaAnimalesAdopcion() {
+  }
+
+  toggleListaAnimalesAdopcionAdmin() {
+  }
+
+  getAnimalesParaMostrarEmpresa() {
+    if (this.mostrarSoloEnAdopcion) {
+      return this.animalesGestionEmpresa.filter(animal => animal.estadoAdopcion === 'DISPONIBLE');
+    }
+    return this.animalesGestionEmpresa;
+  }
+
+  getAnimalesParaMostrarAdmin() {
+    let animalesFiltrados = this.filteredAnimalesGestionAdmin;
+    if (this.mostrarSoloEnAdopcionAdmin) {
+      animalesFiltrados = animalesFiltrados.filter(animal => animal.estadoAdopcion === 'DISPONIBLE');
+    }
+    return animalesFiltrados;
+  }
+
+  async cambiarDomestico(animal: any, value: boolean) {
+    await this.presentLoading('Actualizando...');
+    try {
+      await this.adopcionesService.updateDomesticoYEstado(animal.id, value, animal.estadoAdopcion).toPromise();
+      animal.isDomestico = value;
+      this.mostrarMensaje('Actualizado correctamente', 'success');
+    } catch (err) {
+      this.mostrarMensaje('Error actualizando estado doméstico', 'danger');
+    } finally {
+      await this.dismissLoading();
+    }
+  }
+
+  async cambiarEstadoAdopcion(animal: any, value: string) {
+    await this.presentLoading('Actualizando estado...');
+    try {
+      await this.adopcionesService.updateDomesticoYEstado(animal.id, animal.isDomestico, value).toPromise();
+      animal.estadoAdopcion = value;
+      this.mostrarMensaje('Estado de adopción actualizado', 'success');
+    } catch (err) {
+      this.mostrarMensaje('Error actualizando estado de adopción', 'danger');
+    } finally {
+      await this.dismissLoading();
+    }
+  }
+
+  async responderSolicitud(solicitud: any, nuevoEstado: 'APROBADA' | 'RECHAZADA') {
+    await this.presentLoading('Respondiendo solicitud...');
+    try {
+      if (nuevoEstado === 'APROBADA') {
+        await this.adopcionesService.aprobarSolicitudAdopcion(solicitud.id).toPromise();
+      } else if (nuevoEstado === 'RECHAZADA') {
+        await this.adopcionesService.rechazarSolicitudAdopcion(solicitud.id).toPromise();
+      } else {
+        throw new Error('Estado no válido para responder solicitud.');
+      }
+      const actionText = nuevoEstado === 'APROBADA' ? 'aprobada' : 'rechazada';
+      this.mostrarMensaje(`Solicitud ${actionText} correctamente.`, 'success');
+      if (this.userRol === 'EMPRESA') {
+        await this.cargarDatosEmpresa();
+      } else if (this.userRol === 'ADMIN') {
+        await this.cargarDatosAdmin();
+      }
+    } catch (err: any) {
+      console.error('Error al responder solicitud:', err);
+      this.mostrarMensaje('Error al responder la solicitud: ' + (err.message || 'Error desconocido'), 'danger');
+    } finally {
+      await this.dismissLoading();
+    }
+  }
+
+  async cambiarEmpresaAnimal(animal: any, event: any) {
+    const empresaId = event.detail.value;
+    if (animal.empresa?.id === empresaId) {
+      return;
+    }
+    await this.presentLoading('Asignando empresa...');
+    try {
+      await this.animalesService.asignarEmpresa(animal.id, empresaId).toPromise();
+
+      const empresaSeleccionada = empresaId ? this.todasLasEmpresas.find(e => e.id === empresaId) : null;
+      animal.empresa = empresaSeleccionada;
+
+      this.mostrarMensaje('Empresa asignada/actualizada correctamente.', 'success');
+    } catch (err: any) {
+      console.error('Error asignando empresa al animal:', err);
+      this.mostrarMensaje('Error asignando empresa: ' + (err.message || 'Error desconocido'), 'danger');
+    } finally {
+      await this.dismissLoading();
+    }
+  }
+
+  async presentLoading(message: string) {
+    this.loading = true;
+    if (this.loadingElement && this.loadingElement.isConnected) {
+        return;
+    }
+    this.loadingElement = await this.loadingCtrl.create({
+        message,
+        spinner: 'circles',
+    });
+    await this.loadingElement.present();
+  }
+
+  async dismissLoading() {
+    if (this.loadingElement && this.loadingElement.parentElement) {
+        try {
+            await this.loadingElement.dismiss();
+        } catch (e) {
+            console.warn('Dismiss loading error:', e);
+        }
+    }
+    this.loadingElement = null;
+    this.loading = false;
+  }
+
   private async mostrarMensaje(mensaje: string, color: string) {
+    if (!mensaje) return;
     const toast = await this.toastController.create({
       message: mensaje,
       duration: 2000,
