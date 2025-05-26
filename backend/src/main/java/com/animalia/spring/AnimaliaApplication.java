@@ -155,13 +155,13 @@ public class AnimaliaApplication {
 
                                 // Creación de usuarios
                                 Usuarios u1 = new Usuarios(null,
-                                                "Ruven",
-                                                "Rrata",
+                                                "Ruben",
+                                                "Serrano",
                                                 "usuario@animalia.com",
                                                 passwordEncoder.encode("123"),
                                                 "123456789",
                                                 "Calle Pageable 123",
-                                                "bardockNegro+.jpg",
+                                                "iconoBase.png",
                                                 Usuarios.TipoUsuario.USER,
                                                 LocalDate.now(),
                                                 0,
