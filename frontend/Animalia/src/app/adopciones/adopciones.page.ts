@@ -5,7 +5,7 @@ import { ToastController, ModalController, LoadingController } from '@ionic/angu
 import { UsuarioService } from '../services/usuario.service';
 import { AdopcionesService } from '../services/adopciones.service';
 import { AdopcionModalComponent } from './adopcion-modal/adopcion-modal.component';
-import { EmpresasService } from '../services/empresas.service'; // Importar EmpresasService
+import { EmpresasService } from '../services/empresas.service';
 
 @Component({
   selector: 'app-adopciones',
@@ -29,7 +29,7 @@ export class AdopcionesPage implements OnInit {
   solicitudesAdmin: any[] = [];
   filteredAnimalesGestionAdmin: any[] = [];
   mostrarSoloEnAdopcionAdmin = false;
-  todasLasEmpresas: any[] = []; // Nueva propiedad para almacenar todas las empresas
+  todasLasEmpresas: any[] = [];
 
   userId: number | null = null;
   selectedFamilia: string | null = null;
@@ -62,7 +62,7 @@ export class AdopcionesPage implements OnInit {
     private modalController: ModalController,
     private usuarioService: UsuarioService,
     private loadingCtrl: LoadingController,
-    private empresasService: EmpresasService // Inyectar EmpresasService
+    private empresasService: EmpresasService
   ) {
     const userIdStr = sessionStorage.getItem('id');
     this.userId = userIdStr ? parseInt(userIdStr) : null;
@@ -99,8 +99,8 @@ export class AdopcionesPage implements OnInit {
         await this.dismissLoading();
       }
     } else if (this.userRol === 'ADMIN') {
-      this.cargarAnimalesDisponibles(); // Para la pestaña "Solicitar Adopción"
-      await this.cargarDatosAdmin(); // Carga animales y solicitudes para las otras pestañas de admin
+      this.cargarAnimalesDisponibles();
+      await this.cargarDatosAdmin();
     } else {
       this.cargarAnimalesDisponibles();
     }
@@ -108,7 +108,7 @@ export class AdopcionesPage implements OnInit {
 
   async cargarDatosAdmin() {
     this.error = null;
-    // await this.presentLoading('Cargando datos de administrador...'); // Loading ya se presenta en ngOnInit
+
     try {
       this.animalesService.getTotalAnimales().subscribe(
         (animales: any[]) => {
@@ -143,7 +143,7 @@ export class AdopcionesPage implements OnInit {
         }
       );
 
-      this.empresasService.getTotalEmpresas().subscribe( // Cargar todas las empresas
+      this.empresasService.getTotalEmpresas().subscribe(
         (empresas: any[]) => {
           this.todasLasEmpresas = empresas;
         },
@@ -152,17 +152,12 @@ export class AdopcionesPage implements OnInit {
           this.mostrarMensaje('Error cargando empresas para admin.', 'danger');
         }
       );
-
-      // Quitar la condición que mostraba mensaje si ambas listas estaban vacías,
-      // ya que ahora hay una tercera carga (empresas)
-      // if (this.animalesGestionAdmin.length === 0 && this.solicitudesAdmin.length === 0) {
-      // }
     } catch (err: any) {
       console.error('Error cargando datos de admin:', err);
       this.error = 'Error cargando datos de admin: ' + (err.message || 'Error desconocido');
       if (this.error) this.mostrarMensaje(this.error, 'danger');
     } finally {
-      await this.dismissLoading(); // Asegurarse que el loading se cierra después de todas las cargas
+      await this.dismissLoading();
     }
   }
 

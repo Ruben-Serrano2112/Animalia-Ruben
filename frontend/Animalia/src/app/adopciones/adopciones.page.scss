@@ -152,3 +152,52 @@ ion-footer {
     }
   }
 }
+
+body.dark {
+
+
+  ion-accordion-group {
+
+    ion-accordion ion-item[slot="header"] {
+      --background: var(--ion-color-step-200, #2e2e2e);
+      --color: var(--ion-color-light-contrast, #ffffff);
+
+      ion-label {
+        color: var(--ion-color-light-contrast, #ffffff);
+      }
+
+
+      ion-icon {
+        color: var(--ion-color-light-contrast, #ffffff);
+      }
+    }
+
+
+    ion-accordion div[slot="content"] {
+      background-color: var(--ion-color-step-100, #222222);
+
+      ion-list {
+        background: transparent;
+
+        ion-item {
+          --background: var(--ion-color-step-150, #2a2a2a);
+          --color: var(--ion-color-light-contrast, #ffffff);
+          --border-color: var(--ion-color-step-250, #383838);
+
+          ion-label {
+            color: var(--ion-color-light-contrast, #ffffff);
+          }
+
+          ion-icon {
+            color: var(--ion-color-primary-contrast, #ffffff);
+          }
+
+
+          &.limpiar-filtro ion-label[color="medium"] {
+            color: var(--ion-color-medium-contrast, #dddddd) !important;
+          }
+        }
+      }
+    }
+  }
+}

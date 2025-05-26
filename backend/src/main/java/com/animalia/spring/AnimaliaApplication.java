@@ -38,77 +38,7 @@ public class AnimaliaApplication {
                         if (animalesRepositorio.count() == 0 && usuariosRepositorio.count() == 0
                                         && empresasRepositorio.count() == 0 && rescatesRepositorio.count() == 0
                                         && fotosRepositorio.count() == 0) {
-                                Animales a1 = new Animales(null, "Canis lupus familiaris", "Perro",
-                                                "Animal domesticado y compañero del ser humano",
-                                                "perro.jpg",
-                                                EstadoConservacion.SIN_RIESGO, Familia.MAMIFERO, false);
-                                Animales a2 = new Animales(null, "Felis catus", "Gato",
-                                                "Animal doméstico, conocido por su agilidad",
-                                                "gato.jpg",
-                                                EstadoConservacion.SIN_RIESGO,
-                                                Animales.Familia.MAMIFERO, false);
-                                Animales a3 = new Animales(null, "Equus ferus caballus", "Caballo",
-                                                "Animal de granja atrapado en una terraza",
-                                                "caballo.jpg", EstadoConservacion.EXTINTO,
-                                                Familia.MAMIFERO, false);
-                                Animales a4 = new Animales(null, "Panthera leo", "León",
-                                                "Gran felino conocido como el rey de la selva",
-                                                "leon.jpg",
-                                                EstadoConservacion.EXTINTO, Animales.Familia.MAMIFERO, false);
-                                Animales a5 = new Animales(null, "Ailuropoda melanoleuca", "Panda",
-                                                "Oso de China, famoso por su color blanco y negro",
-                                                "panda.jpg", EstadoConservacion.PELIGRO_EXTINCION,
-                                                Familia.MAMIFERO, false);
-                                Animales a6 = new Animales(null, "Aquila adalberti", "Águila Imperial Ibérica",
-                                                "Es una de las aves endémicas de la península ibérica.", "aguila.jpg", EstadoConservacion.BAJO_RIESGO, Familia.AVES, false);
-                                Animales a7 = new Animales(null, "Ambystoma mexicanum", "Ajolote",
-                                                "El ajolote​ es una especie de anfibio relacionado con la salamandra tigre.​​",
-                                                "ajolote.jpg", EstadoConservacion.PELIGRO_EXTINCION,
-                                                Familia.ANFIBIO, false);
-                                Animales a8 = new Animales(null, "Capra aegagrus hircus", "Cabra",
-                                                "La cabra es un mamífero que fue domesticado alrededor del octavo milenio a.C..​​",
-                                                "cabra.jpg", EstadoConservacion.SIN_RIESGO,
-                                                Familia.MAMIFERO, false);
-                                Animales a9 = new Animales(null, "Sus scrofa domesticus", "Cerdo",
-                                                "Es un animal doméstico usado en la alimentación humana por muchos pueblos.​​",
-                                                "cerdo.jpg", EstadoConservacion.SIN_RIESGO,
-                                                Familia.MAMIFERO, false);
-                                Animales a10 = new Animales(null, "Acipenser sturio", "Esturión Europeo",
-                                                "Presenta cuatro barbillas y un hocico muy prominente. El dorso es marrón o gris oscuro más pálido sobre los costados y el vientre blanco.​",
-                                                "esturion_europeo.jpg", EstadoConservacion.PELIGRO_EXTINCION,
-                                                Familia.PECES, false);
-                                Animales a11 = new Animales(null, "Lynx pardinus", "Lince Ibérico",
-                                                "El lince ibérico es una especie de mamífero endémico de la península ibérica.​",
-                                                "lince_iberico.jpg", EstadoConservacion.PELIGRO_EXTINCION,
-                                                Familia.MAMIFERO, false);
-                                Animales a12 = new Animales(null, "Gallotia simonyi", "Lagarto Gigante de El Hierro",
-                                                "El lagarto gigante se considera, según una ley del Gobierno de Canarias, el símbolo natural de la isla de El Hierro​.",
-                                                "lagarto_gigante_de_el_hierro.jpg", EstadoConservacion.PELIGRO_EXTINCION,
-                                                Familia.REPTIL, false);
-                                Animales a13 = new Animales(null, "Ovis orientalis", "Oveja",
-                                                "La oveja ​ es un mamífero cuadrúpedo ungulado doméstico, utilizado como ganado​.",
-                                                "oveja.jpg", EstadoConservacion.SIN_RIESGO,
-                                                Familia.MAMIFERO, false);
-                                Animales a14 = new Animales(null, "Balaeniceps rex", "Picozapato",
-                                                "El picozapato​ es una especie de ave el cual su nombre común alude a la forma de su enorme pico.",
-                                                "picozapato.jpg",EstadoConservacion.BAJO_RIESGO,
-                                                Familia.AVES, false);
-                                Animales a15 = new Animales(null, "Bos taurus", "Toro",
-                                                "Se caracteriza por su cuerpo robusto, cubierto de pelo corto, y por sus cuernos.",
-                                                "toro.jpg",EstadoConservacion.SIN_RIESGO,
-                                                Familia.MAMIFERO, false);
-                                Animales a16 = new Animales(null, "Gypaetus barbatus", "Quebrantahuesos",
-                                                "Es un buitre notablemente distinto de otras aves de presa parecidas.",
-                                                "quebrantahuesos.jpg",EstadoConservacion.BAJO_RIESGO,
-                                                Familia.AVES, false);
-                                Animales a17 = new Animales(null, "Bos taurus", "Vaca",
-                                                "Tiene el cuerpo cubierto de pelo, tiene cuatro patas y rabo.",
-                                                "vaca.jpg",EstadoConservacion.BAJO_RIESGO,
-                                                Familia.MAMIFERO, false);
-                                List<Animales> animales = Arrays.asList(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17);
-                                animales.forEach(animal -> {
-                                        animalesRepositorio.save(animal);
-                                });
+
                                 Empresas e1 = new Empresas(null, "Clínica veterinaria",
                                                 "C. Venezuela, 12, 03010 Alicante (Alacant), Alicante",
                                                 "12345678",
@@ -144,6 +74,84 @@ public class AnimaliaApplication {
 
                                 // Lista de empresas
                                 List<Empresas> empresas = Arrays.asList(e1, e2, e3, e4, e5, e6);
+
+                                Animales a1 = new Animales(null, "Canis lupus familiaris", "Perro",
+                                                "Animal domesticado y compañero del ser humano",
+                                                "perro.jpg",
+                                                EstadoConservacion.SIN_RIESGO, Familia.MAMIFERO, false);
+                                a1.setEmpresa(e5);
+                                Animales a2 = new Animales(null, "Felis catus", "Gato",
+                                                "Animal doméstico, conocido por su agilidad",
+                                                "gato.jpg",
+                                                EstadoConservacion.SIN_RIESGO,
+                                                Animales.Familia.MAMIFERO, false);
+                                a2.setEmpresa(e5);
+                                Animales a3 = new Animales(null, "Equus ferus caballus", "Caballo",
+                                                "Animal de granja atrapado en una terraza",
+                                                "caballo.jpg", EstadoConservacion.EXTINTO,
+                                                Familia.MAMIFERO, false);
+                                a3.setEmpresa(e5);
+                                Animales a4 = new Animales(null, "Panthera leo", "León",
+                                                "Gran felino conocido como el rey de la selva",
+                                                "leon.jpg",
+                                                EstadoConservacion.EXTINTO, Animales.Familia.MAMIFERO, false);
+                                Animales a5 = new Animales(null, "Ailuropoda melanoleuca", "Panda",
+                                                "Oso de China, famoso por su color blanco y negro",
+                                                "panda.jpg", EstadoConservacion.PELIGRO_EXTINCION,
+                                                Familia.MAMIFERO, false);
+                                Animales a6 = new Animales(null, "Aquila adalberti", "Águila Imperial Ibérica",
+                                                "Es una de las aves endémicas de la península ibérica.", "aguila.jpg",
+                                                EstadoConservacion.BAJO_RIESGO, Familia.AVES, false);
+                                Animales a7 = new Animales(null, "Ambystoma mexicanum", "Ajolote",
+                                                "El ajolote​ es una especie de anfibio relacionado con la salamandra tigre.​​",
+                                                "ajolote.jpg", EstadoConservacion.PELIGRO_EXTINCION,
+                                                Familia.ANFIBIO, false);
+                                Animales a8 = new Animales(null, "Capra aegagrus hircus", "Cabra",
+                                                "La cabra es un mamífero que fue domesticado alrededor del octavo milenio a.C..​​",
+                                                "cabra.jpg", EstadoConservacion.SIN_RIESGO,
+                                                Familia.MAMIFERO, false);
+                                Animales a9 = new Animales(null, "Sus scrofa domesticus", "Cerdo",
+                                                "Es un animal doméstico usado en la alimentación humana por muchos pueblos.​​",
+                                                "cerdo.jpg", EstadoConservacion.SIN_RIESGO,
+                                                Familia.MAMIFERO, false);
+                                Animales a10 = new Animales(null, "Acipenser sturio", "Esturión Europeo",
+                                                "Presenta cuatro barbillas y un hocico muy prominente. El dorso es marrón o gris oscuro más pálido sobre los costados y el vientre blanco.​",
+                                                "esturion_europeo.jpg", EstadoConservacion.PELIGRO_EXTINCION,
+                                                Familia.PECES, false);
+                                Animales a11 = new Animales(null, "Lynx pardinus", "Lince Ibérico",
+                                                "El lince ibérico es una especie de mamífero endémico de la península ibérica.​",
+                                                "lince_iberico.jpg", EstadoConservacion.PELIGRO_EXTINCION,
+                                                Familia.MAMIFERO, false);
+                                Animales a12 = new Animales(null, "Gallotia simonyi", "Lagarto Gigante de El Hierro",
+                                                "El lagarto gigante se considera, según una ley del Gobierno de Canarias, el símbolo natural de la isla de El Hierro​.",
+                                                "lagarto_gigante_de_el_hierro.jpg",
+                                                EstadoConservacion.PELIGRO_EXTINCION,
+                                                Familia.REPTIL, false);
+                                Animales a13 = new Animales(null, "Ovis orientalis", "Oveja",
+                                                "La oveja ​ es un mamífero cuadrúpedo ungulado doméstico, utilizado como ganado​.",
+                                                "oveja.jpg", EstadoConservacion.SIN_RIESGO,
+                                                Familia.MAMIFERO, false);
+                                Animales a14 = new Animales(null, "Balaeniceps rex", "Picozapato",
+                                                "El picozapato​ es una especie de ave el cual su nombre común alude a la forma de su enorme pico.",
+                                                "picozapato.jpg", EstadoConservacion.BAJO_RIESGO,
+                                                Familia.AVES, false);
+                                Animales a15 = new Animales(null, "Bos taurus", "Toro",
+                                                "Se caracteriza por su cuerpo robusto, cubierto de pelo corto, y por sus cuernos.",
+                                                "toro.jpg", EstadoConservacion.SIN_RIESGO,
+                                                Familia.MAMIFERO, false);
+                                Animales a16 = new Animales(null, "Gypaetus barbatus", "Quebrantahuesos",
+                                                "Es un buitre notablemente distinto de otras aves de presa parecidas.",
+                                                "quebrantahuesos.jpg", EstadoConservacion.BAJO_RIESGO,
+                                                Familia.AVES, false);
+                                Animales a17 = new Animales(null, "Bos taurus", "Vaca",
+                                                "Tiene el cuerpo cubierto de pelo, tiene cuatro patas y rabo.",
+                                                "vaca.jpg", EstadoConservacion.BAJO_RIESGO,
+                                                Familia.MAMIFERO, false);
+                                List<Animales> animales = Arrays.asList(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11,
+                                                a12, a13, a14, a15, a16, a17);
+                                animales.forEach(animal -> {
+                                        animalesRepositorio.save(animal);
+                                });
 
                                 // Creación de usuarios
                                 Usuarios u1 = new Usuarios(null,
@@ -186,7 +194,7 @@ public class AnimaliaApplication {
                                                 LocalDate.now(),
                                                 5, e5,
                                                 false);
-                                
+
                                 Usuarios u4 = new Usuarios(null,
                                                 "David",
                                                 "Cascala",
