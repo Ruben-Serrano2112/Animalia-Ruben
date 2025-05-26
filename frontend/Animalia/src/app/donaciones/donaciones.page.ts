@@ -254,7 +254,7 @@ export class DonacionesPage implements OnInit {
     if (this.isEmpresa) this.showDonaciones = true;
   }
 
-  async verMisDonaciones() {
+  verMisDonaciones() {
     const usuarioId = sessionStorage.getItem('id');
     if (usuarioId) {
       this.donacionesService.obtenerDonacionesPorUsuario(Number(usuarioId)).subscribe(async donaciones => {
@@ -271,7 +271,7 @@ export class DonacionesPage implements OnInit {
           }
           return { ...donacion, nombreEmpresa };
         }));
-        this.showUserDonaciones = true;
+        this.showUserDonations = true;
       });
     }
   }

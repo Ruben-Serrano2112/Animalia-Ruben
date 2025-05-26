@@ -32,7 +32,6 @@ public class Adopcion {
     @Enumerated(EnumType.STRING)
     private EstadoSolicitud estado = EstadoSolicitud.PENDIENTE;
     
-    @Column(length = 2000)
     private String comentarios;
     
     @Column(nullable = false)

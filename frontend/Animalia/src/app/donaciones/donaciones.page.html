@@ -112,7 +112,7 @@
         <ion-list *ngIf="donacionesUsuario.length > 0">
           <ion-item *ngFor="let donacion of donacionesUsuario">
             <ion-label>
-              <h2>Donación de {{ donacion.monto }}€ a {{ donacion.nombreEmpresa }}</h2>
+              <h2>Donación de {{ donacion.monto }}€ a empresa #{{ donacion.empresaId }}</h2>
               <p>{{ donacion.comentario }}</p>
               <p class="fecha">{{ donacion.fecha | date:'short' }}</p>
             </ion-label>
