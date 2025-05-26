@@ -13,6 +13,7 @@ export class AnimalesService {
   getAnimales(page: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/animales?page=${page}`);
   }
+  // Obtener todos los animales para calcular el total de páginas
   getTotalAnimales() {
     return this.http.get<any>(`${this.apiUrl}/animales/todos`);
   }
@@ -43,7 +44,7 @@ export class AnimalesService {
     const adopcionData = {
       animal_id: animalId,
       usuario_id: usuarioId,
-      comentarios: comentarios,
+      comentarios: comentarios, // This field was already present
       estado: 'PENDIENTE',
       deleted: false
     };
@@ -56,6 +57,10 @@ export class AnimalesService {
   }
 
   asignarEmpresa(animalId: number, empresaId: number | null): Observable<any> {
+    // El backend debe estar preparado para recibir null como empresaId para desasignar.
+    // La URL podría ser algo como /animales/{animalId}/asignar-empresa
+    // o un PUT general a /animales/{animalId} con el nuevo empresaId en el body.
+    // Por simplicidad, usaré un PUT específico.
     return this.http.put<any>(`${this.apiUrl}/animales/${animalId}/asignar-empresa`, { empresaId });
   }
 }

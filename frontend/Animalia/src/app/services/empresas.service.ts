@@ -14,6 +14,7 @@ export class EmpresasService {
   getEmpresas(page: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}?page=${page}`);
   }
+  // Obtener todos los animales para calcular el total de páginas
   getTotalEmpresas() {
     return this.http.get<any>(`${this.apiUrl}/todos`);
   }

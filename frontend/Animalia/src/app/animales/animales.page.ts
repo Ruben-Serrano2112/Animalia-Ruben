@@ -21,6 +21,7 @@ import {
 export class AnimalesPage implements OnInit {
   public animales: any[] = [];
   public filteredAnimals: any[] = [];
+  //filteredAnimals: any[] = [];
   public showList = false;
   public selectedFamilia: string | null = null;
   menuType: string = 'overlay';
@@ -28,10 +29,10 @@ export class AnimalesPage implements OnInit {
 
   totalAnimales: number = 0;
   totalPages: number = 0;
-  currentPage: number = 0;
-  currentPagehtml: number = 1;
+  currentPage: number = 0;  // Página para el backend
+  currentPagehtml: number = 1; // Página que se mostrará en el HTML (empieza desde 1)
   itemsPerPage: number = 5;
-  paginaActual: any[] = [];
+  paginaActual: any[] = [];  // Página para el backend
 
   constructor(
     private animalesService: AnimalesService,
@@ -41,6 +42,7 @@ export class AnimalesPage implements OnInit {
   ) {}
 
   ngOnInit() {
+    // Obtener todos los animales al iniciar
     this.animalesService.getTotalAnimales().subscribe((animales: any[]) => {
       this.animales = animales.map((animal: any) => ({
         ...animal,

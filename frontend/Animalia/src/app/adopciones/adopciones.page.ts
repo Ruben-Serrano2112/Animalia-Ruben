@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { ToastController, ModalController } from '@ionic/angular';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AdopcionModalComponent } from './adopcion-modal/adopcion-modal.component';
+import { EmpresasService } from '../services/empresas.service'; // Importar EmpresasService
 
 @Component({
   selector: 'app-adopciones',
@@ -12,8 +13,23 @@ import { AdopcionModalComponent } from './adopcion-modal/adopcion-modal.componen
   standalone: false
 })
 export class AdopcionesPage implements OnInit {
-  animales: any[] = [];
-  filteredAnimals: any[] = [];
+
+  animalesDisponiblesUsuario: any[] = [];
+  filteredAnimalesUsuario: any[] = [];
+
+  totalAnimalesUsuario: number = 0;
+  totalPagesUsuario: number = 0;
+  currentPageUsuario: number = 0;
+  currentPagehtmlUsuario: number = 1;
+  paginaActualUsuario: any[] = [];
+
+  animalesGestionEmpresa: any[] = [];
+  animalesGestionAdmin: any[] = [];
+  solicitudesAdmin: any[] = [];
+  filteredAnimalesGestionAdmin: any[] = [];
+  mostrarSoloEnAdopcionAdmin = false;
+  todasLasEmpresas: any[] = []; // Nueva propiedad para almacenar todas las empresas
+
   userId: number | null = null;
   selectedFamilia: string | null = null;
   adoptionForm: FormGroup;
@@ -31,20 +47,111 @@ export class AdopcionesPage implements OnInit {
     private animalesService: AnimalesService,
     private router: Router,
     private toastController: ToastController,
-    private formBuilder: FormBuilder,
-    private modalController: ModalController
+    private modalController: ModalController,
+    private usuarioService: UsuarioService,
+    private loadingCtrl: LoadingController,
+    private empresasService: EmpresasService // Inyectar EmpresasService
   ) {
     const userIdStr = sessionStorage.getItem('id');
     this.userId = userIdStr ? parseInt(userIdStr) : null;
-
-    this.adoptionForm = this.formBuilder.group({
-      comentarios: ['', [Validators.required, Validators.minLength(50)]],
-      aceptaTerminos: [false, Validators.requiredTrue]
-    });
+    this.userRol = sessionStorage.getItem('rol');
   }
 
-  ngOnInit() {
-    this.cargarAnimalesDisponibles();
+  async ngOnInit() {
+    await this.presentLoading('Cargando...');
+    this.userRol = sessionStorage.getItem('rol');
+
+    if (this.userRol === 'EMPRESA') {
+      const userIdForEmpresa = sessionStorage.getItem('id');
+      if (userIdForEmpresa) {
+        try {
+          const empresaIdFromService = await this.usuarioService.getEmpresaIdByUsuarioId(userIdForEmpresa).toPromise();
+          if (empresaIdFromService === null || empresaIdFromService === undefined) {
+            throw new Error('No se pudo obtener el ID de la empresa para el usuario.');
+          }
+          this.empresaId = Number(empresaIdFromService);
+          if (!this.empresaId) {
+            throw new Error('No se encontró una empresa asociada o el ID no es válido.');
+          }
+          sessionStorage.setItem('empresaId', this.empresaId.toString());
+          await this.cargarDatosEmpresa();
+        } catch (err: any) {
+          console.error('Error obteniendo datos de empresa:', err);
+          this.error = err.message || 'Error crítico cargando datos de empresa.';
+          if (this.error) this.mostrarMensaje(this.error, 'danger');
+          await this.dismissLoading();
+        }
+      } else {
+        this.error = 'Usuario (empresa) no autenticado.';
+        if (this.error) this.mostrarMensaje(this.error, 'danger');
+        await this.dismissLoading();
+      }
+    } else if (this.userRol === 'ADMIN') {
+      this.cargarAnimalesDisponibles(); // Para la pestaña "Solicitar Adopción"
+      await this.cargarDatosAdmin(); // Carga animales y solicitudes para las otras pestañas de admin
+    } else {
+      this.cargarAnimalesDisponibles();
+    }
+  }
+
+  async cargarDatosAdmin() {
+    this.error = null;
+    // await this.presentLoading('Cargando datos de administrador...'); // Loading ya se presenta en ngOnInit
+    try {
+      this.animalesService.getTotalAnimales().subscribe(
+        (animales: any[]) => {
+          this.animalesGestionAdmin = animales.map((animal: any) => {
+            let domesticoValue = false;
+            if (typeof animal.isDomestico === 'boolean') {
+              domesticoValue = animal.isDomestico;
+            } else if (typeof animal.domestico === 'boolean') {
+              domesticoValue = animal.domestico;
+            }
+            return {
+              ...animal,
+              isDomestico: domesticoValue,
+              estado_conservacion: animal.estado_conservacion ? animal.estado_conservacion.replace(/_/g, ' ') : 'No especificado'
+            };
+          });
+          this.filteredAnimalesGestionAdmin = [...this.animalesGestionAdmin];
+        },
+        (err: any) => {
+          console.error('Error cargando todos los animales para admin:', err);
+          this.mostrarMensaje('Error cargando animales para admin.', 'danger');
+        }
+      );
+
+      this.adopcionesService.getTodasLasSolicitudes().subscribe(
+        (solicitudes: any[]) => {
+          this.solicitudesAdmin = solicitudes;
+        },
+        (err: any) => {
+          console.error('Error cargando todas las solicitudes para admin:', err);
+          this.mostrarMensaje('Error cargando solicitudes para admin.', 'danger');
+        }
+      );
+
+      this.empresasService.getTotalEmpresas().subscribe( // Cargar todas las empresas
+        (empresas: any[]) => {
+          this.todasLasEmpresas = empresas;
+        },
+        (err: any) => {
+          console.error('Error cargando todas las empresas para admin:', err);
+          this.mostrarMensaje('Error cargando empresas para admin.', 'danger');
+        }
+      );
+
+      // Quitar la condición que mostraba mensaje si ambas listas estaban vacías,
+      // ya que ahora hay una tercera carga (empresas)
+      // if (this.animalesGestionAdmin.length === 0 && this.solicitudesAdmin.length === 0) {
+      // }
+    } catch (err: any) {
+      console.error('Error cargando datos de admin:', err);
+      this.error = 'Error cargando datos de admin: ' + (err.message || 'Error desconocido');
+      if (this.error) this.mostrarMensaje(this.error, 'danger');
+    } finally {
+      await this.dismissLoading(); // Asegurarse que el loading se cierra después de todas las cargas
+    }
   }
 
   cargarAnimalesDisponibles() {
