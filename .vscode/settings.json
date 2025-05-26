@@ -3,6 +3,5 @@
     "java.configuration.updateBuildConfiguration": "automatic",
     "java.project.sourcePaths": [
         "frontend/Animalia/assets"
-    ],
-    "maven.view": "flat"
+    ]
 }
