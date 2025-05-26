@@ -38,15 +38,52 @@ public class AnimaliaApplication {
                         if (animalesRepositorio.count() == 0 && usuariosRepositorio.count() == 0
                                         && empresasRepositorio.count() == 0 && rescatesRepositorio.count() == 0
                                         && fotosRepositorio.count() == 0) {
+
+                                Empresas e1 = new Empresas(null, "Clínica veterinaria",
+                                                "C. Venezuela, 12, 03010 Alicante (Alacant), Alicante",
+                                                "12345678",
+                                                "clinica@example.com", TipoEmpresa.CLINICA, "url_empresa_1.es",
+                                                LocalDate.of(1999, 12, 6), false, new HashSet<>());
+                                Empresas e2 = new Empresas(null, "Acuario",
+                                                "Gran Vía, 1, 03010 Alicante (Alacant), Alicante", "87654321",
+                                                "acuario@example.com", TipoEmpresa.ACUARIO, "url_empresa_2.es",
+                                                LocalDate.of(1999, 12, 6), false, new HashSet<>());
+                                Empresas e3 = new Empresas(null, "Hospital veterinario",
+                                                "Av. Pintor Baeza, 12, 03010 Alicante (Alacant), Alicante", "23456789",
+                                                "hospital@example.com", TipoEmpresa.HOSPITAL, "url_empresa_3.es",
+                                                LocalDate.of(1999, 12, 6), false, new HashSet<>());
+                                Empresas e4 = new Empresas(null, "Protectora Animales",
+                                                "C. Pablo Neruda, 03011 Alicante (Alacant), Alicante",
+                                                "34567890",
+                                                "protectora@example.com", TipoEmpresa.PROTECTORA, "url_empresa_4.es",
+                                                LocalDate.of(1999, 12, 6), false, new HashSet<>());
+                                Empresas e5 = new Empresas(null, "Refugio Don Fabro",
+                                                "C. Maravilla Damasco Fierro, 03011 Alicante (Alacant), Alicante",
+                                                "45678901",
+                                                "fabro234@example.com", TipoEmpresa.REFUGIO,
+                                                "https://www.youtube.com/channel/UCe_vi8ZY603vDSYEVMayV0A",
+                                                LocalDate.of(1999, 12, 6), false, new HashSet<>());
+                                Empresas e6 = new Empresas(null, "Reserva de Animales", "C. Vicente Alexandre",
+                                                "56789012",
+                                                "reserva@example.com", TipoEmpresa.RESERVA, "url_empresa_6.es",
+                                                LocalDate.of(1999, 12, 6), false, new HashSet<>());
+                                List<Empresas> empresas = Arrays.asList(e1, e2, e3, e4, e5, e6);
+
+                                empresasRepositorio.saveAll(empresas);
+
                                 Animales a1 = new Animales(null, "Canis lupus familiaris", "Perro",
                                                 "Animal domesticado y compañero del ser humano",
                                                 "perro.jpg",
                                                 EstadoConservacion.SIN_RIESGO, Familia.MAMIFERO, false);
+                                a1.setEmpresa(e5);
+
                                 Animales a2 = new Animales(null, "Felis catus", "Gato",
                                                 "Animal doméstico, conocido por su agilidad",
                                                 "gato.jpg",
                                                 EstadoConservacion.SIN_RIESGO,
                                                 Animales.Familia.MAMIFERO, false);
+                                a2.setEmpresa(e5);
+
                                 Animales a3 = new Animales(null, "Equus ferus caballus", "Caballo",
                                                 "Animal de granja atrapado en una terraza",
                                                 "caballo.jpg", EstadoConservacion.EXTINTO,
@@ -60,7 +97,8 @@ public class AnimaliaApplication {
                                                 "panda.jpg", EstadoConservacion.PELIGRO_EXTINCION,
                                                 Familia.MAMIFERO, false);
                                 Animales a6 = new Animales(null, "Aquila adalberti", "Águila Imperial Ibérica",
-                                                "Es una de las aves endémicas de la península ibérica.", "aguila.jpg", EstadoConservacion.BAJO_RIESGO, Familia.AVES, false);
+                                                "Es una de las aves endémicas de la península ibérica.", "aguila.jpg",
+                                                EstadoConservacion.BAJO_RIESGO, Familia.AVES, false);
                                 Animales a7 = new Animales(null, "Ambystoma mexicanum", "Ajolote",
                                                 "El ajolote​ es una especie de anfibio relacionado con la salamandra tigre.​​",
                                                 "ajolote.jpg", EstadoConservacion.PELIGRO_EXTINCION,
@@ -83,7 +121,8 @@ public class AnimaliaApplication {
                                                 Familia.MAMIFERO, false);
                                 Animales a12 = new Animales(null, "Gallotia simonyi", "Lagarto Gigante de El Hierro",
                                                 "El lagarto gigante se considera, según una ley del Gobierno de Canarias, el símbolo natural de la isla de El Hierro​.",
-                                                "lagarto_gigante_de_el_hierro.jpg", EstadoConservacion.PELIGRO_EXTINCION,
+                                                "lagarto_gigante_de_el_hierro.jpg",
+                                                EstadoConservacion.PELIGRO_EXTINCION,
                                                 Familia.REPTIL, false);
                                 Animales a13 = new Animales(null, "Ovis orientalis", "Oveja",
                                                 "La oveja ​ es un mamífero cuadrúpedo ungulado doméstico, utilizado como ganado​.",
@@ -91,61 +130,27 @@ public class AnimaliaApplication {
                                                 Familia.MAMIFERO, false);
                                 Animales a14 = new Animales(null, "Balaeniceps rex", "Picozapato",
                                                 "El picozapato​ es una especie de ave el cual su nombre común alude a la forma de su enorme pico.",
-                                                "picozapato.jpg",EstadoConservacion.BAJO_RIESGO,
+                                                "picozapato.jpg", EstadoConservacion.BAJO_RIESGO,
                                                 Familia.AVES, false);
                                 Animales a15 = new Animales(null, "Bos taurus", "Toro",
                                                 "Se caracteriza por su cuerpo robusto, cubierto de pelo corto, y por sus cuernos.",
-                                                "toro.jpg",EstadoConservacion.SIN_RIESGO,
+                                                "toro.jpg", EstadoConservacion.SIN_RIESGO,
                                                 Familia.MAMIFERO, false);
                                 Animales a16 = new Animales(null, "Gypaetus barbatus", "Quebrantahuesos",
                                                 "Es un buitre notablemente distinto de otras aves de presa parecidas.",
-                                                "quebrantahuesos.jpg",EstadoConservacion.BAJO_RIESGO,
+                                                "quebrantahuesos.jpg", EstadoConservacion.BAJO_RIESGO,
                                                 Familia.AVES, false);
                                 Animales a17 = new Animales(null, "Bos taurus", "Vaca",
                                                 "Tiene el cuerpo cubierto de pelo, tiene cuatro patas y rabo.",
-                                                "vaca.jpg",EstadoConservacion.BAJO_RIESGO,
+                                                "vaca.jpg", EstadoConservacion.BAJO_RIESGO,
                                                 Familia.MAMIFERO, false);
-                                List<Animales> animales = Arrays.asList(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17);
+                                List<Animales> animales = Arrays.asList(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11,
+                                                a12, a13, a14, a15, a16, a17);
+
                                 animales.forEach(animal -> {
                                         animalesRepositorio.save(animal);
                                 });
-                                Empresas e1 = new Empresas(null, "Clínica veterinaria",
-                                                "C. Venezuela, 12, 03010 Alicante (Alacant), Alicante",
-                                                "12345678",
-                                                "clinica@example.com", TipoEmpresa.CLINICA, "url_empresa_1.es",
-                                                LocalDate.of(1999, 12, 6), false, new HashSet<>());
-                                Empresas e2 = new Empresas(null, "Acuario",
-                                                "Gran Vía, 1, 03010 Alicante (Alacant), Alicante", "87654321",
-                                                "acuario@example.com", TipoEmpresa.ACUARIO, "url_empresa_2.es",
-                                                LocalDate.of(1999, 12, 6), false, new HashSet<>());
 
-                                Empresas e3 = new Empresas(null, "Hospital veterinario",
-                                                "Av. Pintor Baeza, 12, 03010 Alicante (Alacant), Alicante", "23456789",
-                                                "hospital@example.com", TipoEmpresa.HOSPITAL, "url_empresa_3.es",
-                                                LocalDate.of(1999, 12, 6), false, new HashSet<>());
-
-                                Empresas e4 = new Empresas(null, "Protectora Animales",
-                                                "C. Pablo Neruda, 03011 Alicante (Alacant), Alicante",
-                                                "34567890",
-                                                "protectora@example.com", TipoEmpresa.PROTECTORA, "url_empresa_4.es",
-                                                LocalDate.of(1999, 12, 6), false, new HashSet<>());
-
-                                Empresas e5 = new Empresas(null, "Refugio Don Fabro",
-                                                "C. Maravilla Damasco Fierro, 03011 Alicante (Alacant), Alicante",
-                                                "45678901",
-                                                "fabro234@example.com", TipoEmpresa.REFUGIO,
-                                                "https://www.youtube.com/channel/UCe_vi8ZY603vDSYEVMayV0A",
-                                                LocalDate.of(1999, 12, 6), false, new HashSet<>());
-
-                                Empresas e6 = new Empresas(null, "Reserva de Animales", "C. Vicente Alexandre",
-                                                "56789012",
-                                                "reserva@example.com", TipoEmpresa.RESERVA, "url_empresa_6.es",
-                                                LocalDate.of(1999, 12, 6), false, new HashSet<>());
-
-                                // Lista de empresas
-                                List<Empresas> empresas = Arrays.asList(e1, e2, e3, e4, e5, e6);
-
-                                // Creación de usuarios
                                 Usuarios u1 = new Usuarios(null,
                                                 "Ruven",
                                                 "Rrata",
@@ -186,7 +191,7 @@ public class AnimaliaApplication {
                                                 LocalDate.now(),
                                                 5, e5,
                                                 false);
-                                
+
                                 Usuarios u4 = new Usuarios(null,
                                                 "David",
                                                 "Cascala",
@@ -200,13 +205,11 @@ public class AnimaliaApplication {
                                                 0,
                                                 null,
                                                 false);
-                                // Lista de usuarios
+
                                 List<Usuarios> usuarios = Arrays.asList(u1, u2, u3, u4);
 
                                 e5.getUsuarios().add(u3);
 
-                                // Guardar empresas y usuarios
-                                empresasRepositorio.saveAll(empresas);
                                 usuariosRepositorio.saveAll(usuarios);
                                 Rescates r1 = new Rescates(null, e5, u3, a1, "Calle Falsa 123",
                                                 Rescates.Estado.ASIGNADO, Rescates.EstadoAnimal.DESCONOCIDO,
@@ -226,7 +229,7 @@ public class AnimaliaApplication {
                                 Rescates r6 = new Rescates(null, e6, u3, a6, "Calle Falsa 123",
                                                 Rescates.Estado.NO_ASIGNADO, Rescates.EstadoAnimal.DESCONOCIDO,
                                                 LocalDate.now(), null);
-                                // Guardar rescates
+
                                 List<Rescates> rescates = Arrays.asList(r1, r2, r3, r4, r5, r6);
                                 rescatesRepositorio.saveAll(rescates);
 
@@ -243,11 +246,9 @@ public class AnimaliaApplication {
                                 Fotos f6 = new Fotos(null, "aguila.jpg", r6, u2, "38.360345|-0.490459",
                                                 "Águila volando", LocalDate.now());
 
-                                // Guardar fotos
                                 List<Fotos> fotos = Arrays.asList(f1, f2, f3, f4, f5, f6);
                                 fotosRepositorio.saveAll(fotos);
 
-                                // Enlazar fotos con rescates
                                 r1.setFotos(Arrays.asList(f1));
                                 r2.setFotos(Arrays.asList(f2));
                                 r3.setFotos(Arrays.asList(f3));
@@ -255,7 +256,6 @@ public class AnimaliaApplication {
                                 r5.setFotos(Arrays.asList(f5));
                                 r6.setFotos(Arrays.asList(f6));
 
-                                // Guardar rescates con fotos
                                 rescatesRepositorio.saveAll(Arrays.asList(r1, r2, r3, r4, r5, r6));
                         }
                 };

@@ -26,7 +26,6 @@ public class ApiError {
 	@NonNull
 	private HttpStatus estado;
 	
-	//Personaliza la forma en que se formatea la variable al serializarse
 	@Builder.Default
 	@JsonFormat(shape = Shape.STRING, pattern="dd/MM/yyyy hh:mm:ss")
 	private LocalDateTime fecha = LocalDateTime.now();

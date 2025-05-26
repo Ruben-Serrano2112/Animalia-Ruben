@@ -39,14 +39,14 @@ public class AdopcionController {
     }
 
     @GetMapping("/empresa/{empresaId}")
-    public ResponseEntity<?> obtenerSolicitudesPorEmpresa(@PathVariable Long empresaId) { // Changed return type to ResponseEntity<?>
+    public ResponseEntity<?> obtenerSolicitudesPorEmpresa(@PathVariable Long empresaId) {
         try {
             List<Adopcion> solicitudes = adopcionServicio.obtenerSolicitudesPorEmpresa(empresaId);
             return ResponseEntity.ok(solicitudes);
         } catch (Exception e) {
             System.err.println("Error fetching solicitudes for empresa " + empresaId + ": " + e.getMessage());
             e.printStackTrace();
-            return ResponseEntity.internalServerError().body("Error al obtener solicitudes de la empresa."); // This is now valid
+            return ResponseEntity.internalServerError().body("Error al obtener solicitudes de la empresa."); 
         }
     }
 

@@ -152,52 +152,47 @@ ion-footer {
     }
   }
 }
-// ...existing code...
-// Dark mode styles for the filter in Adopciones page
+
 body.dark {
 
-  // Target the accordion group used for filtering
   ion-accordion-group {
 
-    // Style for the main filter header (e.g., "Filtrar por Categoría")
     ion-accordion ion-item[slot="header"] {
-      --background: var(--ion-color-step-200, #2e2e2e); // Darker background for the header
-      --color: var(--ion-color-light-contrast, #ffffff); // Light text for the header label
+      --background: var(--ion-color-step-200, #2e2e2e);
+      --color: var(--ion-color-light-contrast, #ffffff);
 
       ion-label {
-        color: var(--ion-color-light-contrast, #ffffff); // Ensure label text is light
+        color: var(--ion-color-light-contrast, #ffffff);
       }
 
-      // If there's an icon in the header, style it too
+
       ion-icon {
         color: var(--ion-color-light-contrast, #ffffff);
       }
     }
 
-    // Style for the content area of the accordion when expanded (contains filter options)
     ion-accordion div[slot="content"] {
-      background-color: var(--ion-color-step-100, #222222); // Slightly lighter dark background for content area
+      background-color: var(--ion-color-step-100, #222222);
 
       ion-list {
-        background: transparent; // Make list background transparent to inherit from parent
+        background: transparent;
 
-        // Style for each filter option item within the list
         ion-item {
-          --background: var(--ion-color-step-150, #2a2a2a); // Background for each filter option
-          --color: var(--ion-color-light-contrast, #ffffff); // Light text for filter options
-          --border-color: var(--ion-color-step-250, #383838); // Subtle border for separation
+          --background: var(--ion-color-step-150, #2a2a2a);
+          --color: var(--ion-color-light-contrast, #ffffff);
+          --border-color: var(--ion-color-step-250, #383838);
 
           ion-label {
-            color: var(--ion-color-light-contrast, #ffffff); // Ensure label text is light
+            color: var(--ion-color-light-contrast, #ffffff);
           }
 
           ion-icon {
-            color: var(--ion-color-primary-contrast, #ffffff); // Icon color, assuming primary is used for checkmark
+            color: var(--ion-color-primary-contrast, #ffffff);
           }
 
-          // Specific style for the "Limpiar filtro" item if needed
+
           &.limpiar-filtro ion-label[color="medium"] {
-            color: var(--ion-color-medium-contrast, #dddddd) !important; // Lighter text for "Limpiar filtro"
+            color: var(--ion-color-medium-contrast, #dddddd) !important;
           }
         }
       }

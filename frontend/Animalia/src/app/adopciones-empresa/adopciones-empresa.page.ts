@@ -18,18 +18,18 @@ export class AdopcionesEmpresaPage implements OnInit {
   animales: any[] = [];
   solicitudes: any[] = [];
   animalesConSolicitudes: any[] = [];
-  public loading: boolean = false; // Added public loading property
-  private loadingElement: HTMLIonLoadingElement | null = null; // Added for LoadingController
-  segmentModel = 'animales'; // Añadir si se eliminó
-  mostrarSoloEnAdopcion = false; // Añadir si se eliminó
-  error: string = ''; // Para mostrar errores en la UI
+  public loading: boolean = false;
+  private loadingElement: HTMLIonLoadingElement | null = null;
+  segmentModel = 'animales';
+  mostrarSoloEnAdopcion = false;
+  error: string = '';
 
   constructor(
     private adopcionesService: AdopcionesService,
-    private usuarioService: UsuarioService, // Inyectar UsuarioService
+    private usuarioService: UsuarioService,
     private toastCtrl: ToastController,
-    private loadingController: LoadingController, // Inyectar LoadingController
-    private router: Router // Inyectar Router
+    private loadingController: LoadingController,
+    private router: Router
   ) {}
 
   async ngOnInit() {
@@ -39,7 +39,7 @@ export class AdopcionesEmpresaPage implements OnInit {
     if (!userId) {
       await this.dismissLoading();
       this.mostrarToast('No se encontró información del usuario. Por favor, inicie sesión nuevamente.', 'danger');
-      this.router.navigate(['/perfil']); // O a la página de login
+      this.router.navigate(['/perfil']);
       return;
     }
 
@@ -66,7 +66,7 @@ export class AdopcionesEmpresaPage implements OnInit {
   }
 
   async presentLoading(message: string) {
-    this.loading = true; // Set loading to true
+    this.loading = true;
     if (this.loadingElement) {
       await this.loadingElement.dismiss();
     }
@@ -82,11 +82,11 @@ export class AdopcionesEmpresaPage implements OnInit {
       await this.loadingElement.dismiss();
       this.loadingElement = null;
     }
-    this.loading = false; // Set loading to false
+    this.loading = false;
   }
 
   async cargarDatos() {
-    // this.loading = true; // Controlado por ngOnInit
+
     if (!this.empresaId) {
       this.error = 'ID de empresa no disponible. No se pueden cargar los datos.';
       this.mostrarToast(this.error, 'warning');
@@ -106,10 +106,10 @@ export class AdopcionesEmpresaPage implements OnInit {
       this.error = 'Error cargando animales/solicitudes: ' + (err.message || 'Error desconocido');
       this.mostrarToast(this.error, 'danger');
     }
-    // this.loading = false; // Controlado por ngOnInit
+
   }
 
-  // Añadir métodos de segmentación si se eliminaron
+
   segmentChanged(ev: any) {
     this.segmentModel = ev.detail.value;
   }

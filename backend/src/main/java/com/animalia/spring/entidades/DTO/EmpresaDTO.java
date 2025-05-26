@@ -34,5 +34,5 @@ public class EmpresaDTO {
         this.deleted = deleted;
     }
     
-    private String password; // New attribute for the password
+    private String password;
 }

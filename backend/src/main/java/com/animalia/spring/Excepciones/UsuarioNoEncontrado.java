@@ -8,7 +8,6 @@ import com.animalia.spring.entidades.Usuarios.TipoUsuario;
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class UsuarioNoEncontrado extends RuntimeException {
 
-    // Identificador de la clase
     private static final long serialVersionUID = 1L;
 
     public UsuarioNoEncontrado(Long id) {

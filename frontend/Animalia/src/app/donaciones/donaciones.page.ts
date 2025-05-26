@@ -250,8 +250,8 @@ export class DonacionesPage implements OnInit {
 
   cerrarFormularioDonacion() {
     this.showFormModal = false;
-    if (this.isAdmin) this.showAdminDonations = true;
-    if (this.isEmpresa) this.showDonations = true;
+    if (this.isAdmin) this.showAdminDonaciones = true;
+    if (this.isEmpresa) this.showDonaciones = true;
   }
 
   async verMisDonaciones() {
@@ -275,13 +275,13 @@ export class DonacionesPage implements OnInit {
           }
           return { ...donacion, nombreEmpresa };
         }));
-        this.showUserDonations = true;
+        this.showUserDonaciones = true;
       });
     }
   }
 
   volverAlFormulario() {
-    this.showUserDonations = false;
+    this.showUserDonaciones = false;
   }
 
   cargarTodasLasDonaciones() {
@@ -307,7 +307,7 @@ export class DonacionesPage implements OnInit {
         }
         return { ...donacion, usuarioNombre, empresaNombre };
       }));
-      this.showAdminDonations = true;
+      this.showAdminDonaciones = true;
     });
   }
 }
